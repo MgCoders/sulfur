@@ -62,7 +62,7 @@ public class ReportesDao {
 
         //Aca voy a buscar el precio hora e ir consolidando las diferentes filas con mismo cargo.
         horaDao.findHorasProyectoTipoTareaXCargo(proyecto, tipoTarea).forEach(horaCompleta -> {
-            logger.info(horaCompleta.toString());
+            //logger.info(horaCompleta.toString());
             Cargo cargo = cargoDao.findById(horaCompleta.cargo_id);
             BigDecimal costoXHora = horaDao.findPrecioHoraCargo(cargo, horaCompleta.dia);
             BigDecimal cantHoras = TimeUtils.durationToBigDecimal(Duration.ofNanos(horaCompleta.duracion));
@@ -97,7 +97,7 @@ public class ReportesDao {
         });
 
         result.add(filaTotal);
-        result.forEach(reporteHoras1 -> logger.info(reporteHoras1.toString()));
+        //result.forEach(reporteHoras1 -> logger.info(reporteHoras1.toString()));
         return result;
     }
 
@@ -119,7 +119,7 @@ public class ReportesDao {
 
         //Aca voy a buscar el precio hora e ir consolidando las diferentes filas con mismo cargo.
         horaDao.findHorasProyectoXCargo(proyecto).forEach(horaCompleta -> {
-            logger.info(horaCompleta.toString());
+            //logger.info(horaCompleta.toString());
             Cargo cargo = cargoDao.findById(horaCompleta.cargo_id);
             BigDecimal costoXHora = horaDao.findPrecioHoraCargo(cargo, horaCompleta.dia);
             BigDecimal cantHoras = TimeUtils.durationToBigDecimal(Duration.ofNanos(horaCompleta.duracion));
@@ -154,7 +154,7 @@ public class ReportesDao {
         });
 
         result.add(filaTotal);
-        result.forEach(reporteHoras1 -> logger.info(reporteHoras1.toString()));
+        //result.forEach(reporteHoras1 -> logger.info(reporteHoras1.toString()));
         return result;
     }
 
@@ -172,7 +172,7 @@ public class ReportesDao {
 
         //Aca voy a buscar el precio hora e ir consolidando las diferentes filas con mismo cargo.
         horaDao.findHorasByFechasXCargo(ini, fin).forEach(horaCompleta -> {
-            logger.info(horaCompleta.toString());
+            //logger.info(horaCompleta.toString());
             Cargo cargo = cargoDao.findById(horaCompleta.cargo_id);
             BigDecimal costoXHora = horaDao.findPrecioHoraCargo(cargo, horaCompleta.dia);
             BigDecimal cantHoras = TimeUtils.durationToBigDecimal(Duration.ofNanos(horaCompleta.duracion));
@@ -205,7 +205,7 @@ public class ReportesDao {
         });
 
         result.add(filaTotal);
-        result.forEach(reporteHoras2 -> logger.info(reporteHoras2.toString()));
+        //result.forEach(reporteHoras2 -> logger.info(reporteHoras2.toString()));
         return result;
     }
 
@@ -223,7 +223,7 @@ public class ReportesDao {
 
         //Aca voy a buscar el precio hora e ir consolidando las diferentes filas con mismo cargo.
         horaDao.findHorasByFechasProyectoXCargo(ini, fin, proyecto).forEach(horaCompleta -> {
-            logger.info(horaCompleta.toString());
+            //logger.info(horaCompleta.toString());
             Cargo cargo = cargoDao.findById(horaCompleta.cargo_id);
             BigDecimal costoXHora = horaDao.findPrecioHoraCargo(cargo, horaCompleta.dia);
             BigDecimal cantHoras = TimeUtils.durationToBigDecimal(Duration.ofNanos(horaCompleta.duracion));
@@ -256,7 +256,7 @@ public class ReportesDao {
         });
 
         result.add(filaTotal);
-        result.forEach(reporteHoras2 -> logger.info(reporteHoras2.toString()));
+        //result.forEach(reporteHoras2 -> logger.info(reporteHoras2.toString()));
         return result;
     }
 
