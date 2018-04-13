@@ -122,7 +122,7 @@ public class StartupBean {
         }
     }
 
-    @Schedule(hour = "*/24", minute = "*", second = "*/5", info = "alertaHorasSinCargar", persistent = false)
+    @Schedule(hour = "*/24", info = "alertaHorasSinCargar", persistent = false)
     public void alertaHorasSinCargar() {
         //Solo si soy master
         if (configuracionDao.getNodoMaster().equals(jbossNodeName)) {
@@ -165,5 +165,11 @@ public class StartupBean {
         }
 
     }
+
+    @Schedule(hour = "*/72", info = "limpiarNotificacionesAntiguas", persistent = false)
+    public void limpiarNotificacionesAntiguas(){
+        notificacionDao.findAll(LocalDateTime.MIN,LocalDateTime.now().minusDays(30)).forEach(notificacion -> notificacionDao.delete(notificacion));
+    }
+
 
 }
