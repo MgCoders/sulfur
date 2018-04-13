@@ -84,7 +84,7 @@ public class RoleNeededFilter implements ContainerRequestFilter {
                 throw new Exception("Rol incorrecto");
             }
 
-            logger.info("#### AUTORIZADO ####");
+            logger.info("#### AUTORIZADO: "+idColaborador+"####");
             containerRequestContext.setSecurityContext(new Authorizer(idColaborador, rolUsuario.name()));
 
         } catch (Exception e) {

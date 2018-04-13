@@ -26,10 +26,10 @@ public class NotificationesService {
     @EJB
     NotificacionDao notificacionDao;
 
-    @Logged
     @Asynchronous
     @Lock(LockType.READ)
     public void nuevaNotificacionHoras(@Observes(during = TransactionPhase.AFTER_SUCCESS) Notificacion notificacion) {
-        logger.info(notificacionDao.save(notificacion).toString());
+        notificacionDao.save(notificacion);
+        logger.info("# NUEVA NOTIFICACION: "+notificacion.getTipo()+" #");
     }
 }
