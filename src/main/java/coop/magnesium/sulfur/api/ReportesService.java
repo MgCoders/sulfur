@@ -176,7 +176,7 @@ public class ReportesService {
                 throw new MagnesiumNotFoundException("Proyecto no encontrado");
 
             List<ReporteHoras1> reporteHoras1List = reportesDao.reporteHoras1Totales(proyecto);
-            reporteHoras1List.forEach(reporteHoras1 -> logger.info(reporteHoras1.toString()));
+            //reporteHoras1List.forEach(reporteHoras1 -> logger.info(reporteHoras1.toString()));
             return Response.ok(reporteHoras1List).build();
 
         } catch (MagnesiumNotFoundException e) {

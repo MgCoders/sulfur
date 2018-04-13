@@ -29,7 +29,7 @@ public class LoggedInterceptor implements Serializable {
         logger.log(Level.INFO, "{0} called with {1} parameters",
                 new Object[]{
                         invocationContext.getMethod().getName(),
-                        Arrays.deepToString(invocationContext.getParameters())
+                        invocationContext.getParameters().length
                 }
         );
         return invocationContext.proceed();
