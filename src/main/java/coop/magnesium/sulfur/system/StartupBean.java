@@ -1,12 +1,9 @@
 package coop.magnesium.sulfur.system;
 
 import coop.magnesium.sulfur.db.dao.*;
-import coop.magnesium.sulfur.db.entities.Colaborador;
 import coop.magnesium.sulfur.db.entities.Notificacion;
 import coop.magnesium.sulfur.db.entities.RecuperacionPassword;
 import coop.magnesium.sulfur.db.entities.TipoNotificacion;
-import coop.magnesium.sulfur.utils.PasswordUtils;
-import coop.magnesium.sulfur.utils.ex.MagnesiumBdMultipleResultsException;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -16,7 +13,6 @@ import javax.inject.Inject;
 import java.time.*;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
@@ -53,13 +49,13 @@ public class StartupBean {
         System.setProperty("user.timezone", "America/Montevideo");
         logger.warning("FECHA HORA DE JVM: " + LocalDateTime.now());
 
-        try {
+        /*try {
             if (colaboradorDao.findByEmail("info@magnesium.coop") == null) {
                 colaboradorDao.save(new Colaborador("info@magnesium.coop", "root", null, PasswordUtils.digestPassword(UUID.randomUUID().toString()), "ADMIN"));
             }
         } catch (MagnesiumBdMultipleResultsException e) {
             logger.warning(e.getMessage());
-        }
+        }*/
         configuraciones();
         setMyselfAsNodoMaster();
 
@@ -122,7 +118,7 @@ public class StartupBean {
         }
     }
 
-    @Schedule(hour = "*/24", info = "alertaHorasSinCargar", persistent = false)
+    @Schedule(hour = "*/72", info = "alertaHorasSinCargar", persistent = false)
     public void alertaHorasSinCargar() {
         //Solo si soy master
         if (configuracionDao.getNodoMaster().equals(jbossNodeName)) {
