@@ -24,6 +24,7 @@ public class Colaborador {
     @NotNull(message = "El campo nombre no puede estar vacío")
     private String nombre;
     @Valid
+    @NotNull(message = "El cargo no puede ser vacío")
     @ManyToOne
     private Cargo cargo;
     private String password;
