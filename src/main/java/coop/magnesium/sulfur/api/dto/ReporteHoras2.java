@@ -2,8 +2,7 @@ package coop.magnesium.sulfur.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import coop.magnesium.sulfur.db.entities.Cargo;
-import coop.magnesium.sulfur.db.entities.Proyecto;
-import coop.magnesium.sulfur.db.entities.TipoTarea;
+import coop.magnesium.sulfur.db.entities.Colaborador;
 import io.swagger.annotations.ApiModel;
 
 import java.math.BigDecimal;
@@ -19,23 +18,17 @@ public class ReporteHoras2 {
 
     public BigDecimal cantidadHoras;
     public BigDecimal precioTotal;
-    public BigDecimal cantidadHorasEstimadas;
-    public BigDecimal precioEstimado;
-    public Proyecto proyecto;
-    public TipoTarea tipoTarea;
+    public Colaborador colaborador;
     public Cargo cargo;
 
     public ReporteHoras2() {
     }
 
-    public ReporteHoras2(BigDecimal cantidadHoras, BigDecimal cantidadHorasEstimadas, BigDecimal precioEstimado, BigDecimal precioTotal, Proyecto proyecto, TipoTarea tipoTarea, Cargo cargo) {
+    public ReporteHoras2(BigDecimal cantidadHoras, BigDecimal precioTotal, Cargo cargo, Colaborador colaborador) {
         this.cantidadHoras = cantidadHoras;
         this.precioTotal = precioTotal;
-        this.cantidadHorasEstimadas = cantidadHorasEstimadas;
-        this.precioEstimado = precioEstimado;
-        this.proyecto = proyecto;
-        this.tipoTarea = tipoTarea;
         this.cargo = cargo;
+        this.colaborador = colaborador;
     }
 
     public BigDecimal getCantidadHoras() {
@@ -46,13 +39,6 @@ public class ReporteHoras2 {
         this.cantidadHoras = cantidadHoras;
     }
 
-    public BigDecimal getCantidadHorasEstimadas() {
-        return cantidadHorasEstimadas;
-    }
-
-    public void setCantidadHorasEstimadas(BigDecimal cantidadHorasEstimadas) {
-        this.cantidadHorasEstimadas = cantidadHorasEstimadas;
-    }
 
     public BigDecimal getPrecioTotal() {
         return precioTotal;
@@ -62,30 +48,6 @@ public class ReporteHoras2 {
         this.precioTotal = precioTotal;
     }
 
-
-    public BigDecimal getPrecioEstimado() {
-        return precioEstimado;
-    }
-
-    public void setPrecioEstimado(BigDecimal precioEstimado) {
-        this.precioEstimado = precioEstimado;
-    }
-
-    public Proyecto getProyecto() {
-        return proyecto;
-    }
-
-    public void setProyecto(Proyecto proyecto) {
-        this.proyecto = proyecto;
-    }
-
-    public TipoTarea getTipoTarea() {
-        return tipoTarea;
-    }
-
-    public void setTipoTarea(TipoTarea tipoTarea) {
-        this.tipoTarea = tipoTarea;
-    }
 
     public Cargo getCargo() {
         return cargo;
@@ -100,10 +62,6 @@ public class ReporteHoras2 {
         return "ReporteHoras1{" +
                 "cantidadHoras=" + cantidadHoras +
                 ", precioTotal=" + precioTotal +
-                ", cantidadHorasEstimadas=" + cantidadHorasEstimadas +
-                ", precioEstimado=" + precioEstimado +
-                ", proyecto=" + proyecto.getCodigo() +
-                ", tipoTarea=" + ((tipoTarea != null) ? tipoTarea.getCodigo() : "-") +
                 ", cargo=" + ((cargo != null) ? cargo.getCodigo() : "-") +
                 '}';
     }

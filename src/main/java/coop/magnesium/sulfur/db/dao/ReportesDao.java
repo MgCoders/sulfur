@@ -2,6 +2,7 @@ package coop.magnesium.sulfur.db.dao;
 
 import coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.api.dto.ReporteHoras1;
+import coop.magnesium.sulfur.api.dto.ReporteHoras2;
 import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.Proyecto;
 import coop.magnesium.sulfur.db.entities.TipoTarea;
@@ -31,9 +32,7 @@ public class ReportesDao {
     @Inject
     CargoDao cargoDao;
     @Inject
-    ProyectoDao proyectoDao;
-    @Inject
-    TipoTareaDao tipoTareaDao;
+    ColaboradorDao colaboradorDao;
     @EJB
     private EstimacionDao estimacionDao;
     @EJB
@@ -253,6 +252,51 @@ public class ReportesDao {
             filaTotal.cantidadHorasEstimadas = reporteHoras1.cantidadHorasEstimadas;
             filaTotal.precioEstimado = reporteHoras1.precioEstimado;
             filaTotal.cantidadHoras = reporteHoras1.cantidadHoras;
+        });
+
+        result.add(filaTotal);
+        //result.forEach(reporteHoras2 -> logger.info(reporteHoras2.toString()));
+        return result;
+    }
+
+    /*
+     * Reporte de horas por fechas por Colaborador
+     */
+    public List<ReporteHoras2> reporteHoras2FechaXColaborador(LocalDate ini, LocalDate fin) {
+
+        //Aca va el resultado
+        Map<Long, ReporteHoras2> reporteXColaborador = new HashMap<>();
+        colaboradorDao.findAll().stream().filter(colaborador -> colaborador.getCargo() != null).forEach(colaborador -> {
+            reporteXColaborador.put(colaborador.getId(), new ReporteHoras2(BigDecimal.ZERO, BigDecimal.ZERO, colaborador.getCargo(), colaborador));
+        });
+
+        //Aca voy a buscar el precio hora e ir consolidando las diferentes filas con mismo colaborador.
+        horaDao.findHorasByFechasXColaborador(ini, fin).forEach(horaCompleta -> {
+            //logger.info(horaCompleta.toString());
+            Cargo cargo = reporteXColaborador.get(horaCompleta.colaborador_id).cargo;
+            BigDecimal costoXHora = horaDao.findPrecioHoraCargo(cargo, horaCompleta.dia);
+            BigDecimal cantHoras = TimeUtils.durationToBigDecimal(Duration.ofNanos(horaCompleta.duracion));
+            BigDecimal costoHoras = costoXHora.multiply(cantHoras);
+            reporteXColaborador.get(horaCompleta.colaborador_id).cantidadHoras = reporteXColaborador.get(horaCompleta.colaborador_id).cantidadHoras.add(cantHoras);
+            reporteXColaborador.get(horaCompleta.colaborador_id).precioTotal = reporteXColaborador.get(horaCompleta.colaborador_id).precioTotal.add(costoHoras);
+        });
+
+
+        //Resultados en lista
+        List<ReporteHoras2> result = new ArrayList<>();
+        result.addAll(reporteXColaborador.values());
+
+        //Ordeno lista por precio hora de cargo al dia de hoy
+        result.sort(comparing(reporteHoras2 -> horaDao.findPrecioHoraCargo(reporteHoras2.cargo, LocalDate.now()), reverseOrder()));
+
+
+        ReporteHoras2 filaTotal = new ReporteHoras2(BigDecimal.ZERO, BigDecimal.ZERO, null, null);
+        result.stream().reduce((r1, r2) -> new ReporteHoras2(
+                r1.cantidadHoras.add(r2.cantidadHoras),
+                r1.precioTotal.add(r2.precioTotal),
+                null, null)).ifPresent(reporteHoras2 -> {
+            filaTotal.precioTotal = reporteHoras2.precioTotal;
+            filaTotal.cantidadHoras = reporteHoras2.cantidadHoras;
         });
 
         result.add(filaTotal);
