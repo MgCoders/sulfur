@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
+import coop.magnesium.sulfur.db.dao.CargoDao;
 import coop.magnesium.sulfur.db.dao.ColaboradorDao;
+import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.Colaborador;
 import coop.magnesium.sulfur.system.DataTimer;
 import coop.magnesium.sulfur.system.MailEvent;
@@ -34,6 +36,7 @@ import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
@@ -48,9 +51,13 @@ public class LoginServiceTest {
      * Acá en arquillian hay que hacerlo a mano.
      */
     final ObjectMapper objectMapper = new ObjectMapper();
+    final Cargo cargo = new Cargo("CC", "CC", new BigDecimal(32.2));
+
 
     @Inject
     ColaboradorDao colaboradorDao;
+    @Inject
+    CargoDao cargoDao;
     @Inject
     Logger logger;
 
@@ -86,7 +93,8 @@ public class LoginServiceTest {
     @Test
     @InSequence(1)
     public void inicializarBd() {
-        logger.info(colaboradorDao.save(new Colaborador("bu", "bu", null, PasswordUtils.digestPassword("bu"), "ADMIN")).toString());
+        Cargo cargo = cargoDao.save(this.cargo);
+        logger.info(colaboradorDao.save(new Colaborador("bu", "bu", cargo, PasswordUtils.digestPassword("bu"), "ADMIN")).toString());
     }
 
 

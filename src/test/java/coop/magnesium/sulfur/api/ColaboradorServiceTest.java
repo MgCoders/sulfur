@@ -103,8 +103,8 @@ public class ColaboradorServiceTest {
     @InSequence(2)
     @RunAsClient
     public void editColaborador(@ArquillianResteasyResource final WebTarget webTarget) {
-
-        Colaborador colaborador = new Colaborador("no", "no", null, "la", "ADMIN");
+        cargo.setId(1L);
+        Colaborador colaborador = new Colaborador("no", "no", cargo, "la", "ADMIN");
 
 
         final Response response = webTarget

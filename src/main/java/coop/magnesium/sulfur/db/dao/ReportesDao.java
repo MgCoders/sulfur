@@ -52,13 +52,13 @@ public class ReportesDao {
     public List<ReporteHoras1> reporteHoras1(Proyecto proyecto, TipoTarea tipoTarea) {
 
         //Busco las estimaciones
-        Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = estimacionDao.findEstimacionProyectoTipoTareaXCargo(proyecto, tipoTarea);
+        Map<Long, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = estimacionDao.findEstimacionProyectoTipoTareaXCargo(proyecto, tipoTarea);
 
 
         //Aca va el resultado
         Map<Cargo, ReporteHoras1> reporteXCargo = new HashMap<>();
         //En principio cada reporte/cargo con Zero.
-        cargoDao.findAll().forEach(cargo -> reporteXCargo.put(cargo, new ReporteHoras1(BigDecimal.ZERO, estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).cantidadHoras : BigDecimal.ZERO, estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).precioTotal : BigDecimal.ZERO, BigDecimal.ZERO, proyecto, tipoTarea, cargo)));
+        cargoDao.findAll().forEach(cargo -> reporteXCargo.put(cargo, new ReporteHoras1(BigDecimal.ZERO, estimacionesXCargo.get(cargo.getId()) != null ? estimacionesXCargo.get(cargo.getId()).cantidadHoras : BigDecimal.ZERO, estimacionesXCargo.get(cargo.getId()) != null ? estimacionesXCargo.get(cargo.getId()).precioTotal : BigDecimal.ZERO, BigDecimal.ZERO, proyecto, tipoTarea, cargo)));
 
         //Aca voy a buscar el precio hora e ir consolidando las diferentes filas con mismo cargo.
         horaDao.findHorasProyectoTipoTareaXCargo(proyecto, tipoTarea).forEach(horaCompleta -> {
@@ -109,13 +109,13 @@ public class ReportesDao {
      */
     public List<ReporteHoras1> reporteHoras1Totales(Proyecto proyecto) {
         //Busco las estimaciones
-        Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = estimacionDao.findEstimacionProyectoXCargo(proyecto);
+        Map<Long, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = estimacionDao.findEstimacionProyectoXCargo(proyecto);
 
 
         //Aca va el resultado
         Map<Cargo, ReporteHoras1> reporteXCargo = new HashMap<>();
         //En principio cada reporte/cargo con Zero.
-        cargoDao.findAll().forEach(cargo -> reporteXCargo.put(cargo, new ReporteHoras1(BigDecimal.ZERO, estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).cantidadHoras : BigDecimal.ZERO, estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).precioTotal : BigDecimal.ZERO, BigDecimal.ZERO, proyecto, null, cargo)));
+        cargoDao.findAll().forEach(cargo -> reporteXCargo.put(cargo, new ReporteHoras1(BigDecimal.ZERO, estimacionesXCargo.get(cargo.getId()) != null ? estimacionesXCargo.get(cargo.getId()).cantidadHoras : BigDecimal.ZERO, estimacionesXCargo.get(cargo.getId()) != null ? estimacionesXCargo.get(cargo.getId()).precioTotal : BigDecimal.ZERO, BigDecimal.ZERO, proyecto, null, cargo)));
 
         //Aca voy a buscar el precio hora e ir consolidando las diferentes filas con mismo cargo.
         horaDao.findHorasProyectoXCargo(proyecto).forEach(horaCompleta -> {
@@ -163,12 +163,12 @@ public class ReportesDao {
      */
     public List<ReporteHoras1> reporteHoras2Fechas(LocalDate ini, LocalDate fin) {
         //Busco las estimaciones
-        Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = estimacionDao.findEstimacionFechasXCargo(ini, fin);
+        Map<Long, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = estimacionDao.findEstimacionFechasXCargo(ini, fin);
 
 
         //Aca va el resultado
         Map<Cargo, ReporteHoras1> reporteXCargo = new HashMap<>();
-        cargoDao.findAll().forEach(cargo -> reporteXCargo.put(cargo, new ReporteHoras1(BigDecimal.ZERO, estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).cantidadHoras : BigDecimal.ZERO, estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).precioTotal : BigDecimal.ZERO, BigDecimal.ZERO, null, null, cargo)));
+        cargoDao.findAll().forEach(cargo -> reporteXCargo.put(cargo, new ReporteHoras1(BigDecimal.ZERO, estimacionesXCargo.get(cargo.getId()) != null ? estimacionesXCargo.get(cargo.getId()).cantidadHoras : BigDecimal.ZERO, estimacionesXCargo.get(cargo.getId()) != null ? estimacionesXCargo.get(cargo.getId()).precioTotal : BigDecimal.ZERO, BigDecimal.ZERO, null, null, cargo)));
 
         //Aca voy a buscar el precio hora e ir consolidando las diferentes filas con mismo cargo.
         horaDao.findHorasByFechasXCargo(ini, fin).forEach(horaCompleta -> {
@@ -214,12 +214,12 @@ public class ReportesDao {
      */
     public List<ReporteHoras1> reporteHoras2FechasProyecto(LocalDate ini, LocalDate fin, Proyecto proyecto) {
         //Busco las estimaciones
-        Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = estimacionDao.findEstimacionFechasProyectoXCargo(ini, fin, proyecto);
+        Map<Long, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = estimacionDao.findEstimacionFechasProyectoXCargo(ini, fin, proyecto);
 
 
         //Aca va el resultado
         Map<Cargo, ReporteHoras1> reporteXCargo = new HashMap<>();
-        cargoDao.findAll().forEach(cargo -> reporteXCargo.put(cargo, new ReporteHoras1(BigDecimal.ZERO, estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).cantidadHoras : BigDecimal.ZERO, estimacionesXCargo.get(cargo) != null ? estimacionesXCargo.get(cargo).precioTotal : BigDecimal.ZERO, BigDecimal.ZERO, proyecto, null, cargo)));
+        cargoDao.findAll().forEach(cargo -> reporteXCargo.put(cargo, new ReporteHoras1(BigDecimal.ZERO, estimacionesXCargo.get(cargo.getId()) != null ? estimacionesXCargo.get(cargo.getId()).cantidadHoras : BigDecimal.ZERO, estimacionesXCargo.get(cargo.getId()) != null ? estimacionesXCargo.get(cargo.getId()).precioTotal : BigDecimal.ZERO, BigDecimal.ZERO, proyecto, null, cargo)));
 
         //Aca voy a buscar el precio hora e ir consolidando las diferentes filas con mismo cargo.
         horaDao.findHorasByFechasProyectoXCargo(ini, fin, proyecto).forEach(horaCompleta -> {

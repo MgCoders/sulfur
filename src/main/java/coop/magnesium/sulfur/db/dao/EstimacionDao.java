@@ -7,6 +7,7 @@ import coop.magnesium.sulfur.db.entities.Estimacion;
 import coop.magnesium.sulfur.db.entities.Proyecto;
 import coop.magnesium.sulfur.db.entities.TipoTarea;
 import coop.magnesium.sulfur.utils.Logged;
+import coop.magnesium.sulfur.utils.TimeUtils;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -16,6 +17,8 @@ import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -72,7 +75,7 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
                 "  c.proyecto_id,\n" +
                 "  su.tipotarea_id,\n" +
                 "  su.cargo_id,\n" +
-                "  sum(su.preciototal) preciototal,\n" +
+                "  su.preciototal,\n" +
                 "  sum(su.duracion)    duracion\n" +
                 "FROM Estimacion c, (\n" +
                 "                     SELECT\n" +
@@ -92,6 +95,7 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
                 "WHERE c.id = su.estimacion_id AND c.fecha >= :fecha_ini AND c.fecha <= :fecha_fin\n" +
                 "GROUP BY\n" +
                 "  c.proyecto_id,\n" +
+                "  su.preciototal,\n" +
                 "  su.tipotarea_id,\n" +
                 "  su.cargo_id;", "EstimacionProyecto");
         query.setParameter("fecha_ini", ini);
@@ -106,7 +110,7 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
                 "  c.proyecto_id,\n" +
                 "  su.tipotarea_id,\n" +
                 "  su.cargo_id,\n" +
-                "  sum(su.preciototal) preciototal,\n" +
+                "  su.preciototal,\n" +
                 "  sum(su.duracion)    duracion\n" +
                 "FROM Estimacion c, (\n" +
                 "                     SELECT\n" +
@@ -127,6 +131,7 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
                 "GROUP BY\n" +
                 "  c.proyecto_id,\n" +
                 "  su.tipotarea_id,\n" +
+                "  su.preciototal,\n" +
                 "  su.cargo_id;", "EstimacionProyecto");
         query.setParameter("fecha_ini", ini);
         query.setParameter("fecha_fin", fin);
@@ -152,7 +157,7 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
                 "  c.proyecto_id,\n" +
                 "  su.tipotarea_id,\n" +
                 "  su.cargo_id,\n" +
-                "  sum(su.preciototal) preciototal,\n" +
+                "  su.preciototal,\n" +
                 "  sum(su.duracion)    duracion\n" +
                 "FROM Estimacion c, (\n" +
                 "                     SELECT\n" +
@@ -174,6 +179,7 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
                 "GROUP BY\n" +
                 "  c.proyecto_id,\n" +
                 "  su.tipotarea_id,\n" +
+                "  su.preciototal,\n" +
                 "  su.cargo_id;", "EstimacionProyecto");
         query.setParameter("proyecto", proyecto.getId());
         query.setParameter("tipotarea", tipoTarea.getId());
@@ -187,7 +193,7 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
                 "  c.proyecto_id,\n" +
                 "  su.tipotarea_id,\n" +
                 "  su.cargo_id,\n" +
-                "  sum(su.preciototal) preciototal,\n" +
+                "  su.preciototal,\n" +
                 "  sum(su.duracion)    duracion\n" +
                 "FROM Estimacion c, (\n" +
                 "                     SELECT\n" +
@@ -208,6 +214,7 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
                 "GROUP BY\n" +
                 "  c.proyecto_id,\n" +
                 "  su.tipotarea_id,\n" +
+                "  su.preciototal,\n" +
                 "  su.cargo_id;", "EstimacionProyecto");
         query.setParameter("proyecto", proyecto.getId());
         @SuppressWarnings("unchecked")
@@ -216,45 +223,65 @@ public class EstimacionDao extends AbstractDao<Estimacion, Long> {
     }
 
     @Logged
-    public Map<Cargo, EstimacionProyectoTipoTareaXCargo> findEstimacionProyectoTipoTareaXCargo(Proyecto proyecto, TipoTarea tipoTarea) {
-        Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargoNative = new HashMap<>();
+    public Map<Long, EstimacionProyectoTipoTareaXCargo> findEstimacionProyectoTipoTareaXCargo(Proyecto proyecto, TipoTarea tipoTarea) {
+        Map<Long, EstimacionProyectoTipoTareaXCargo> estimacionesXCargoNative = new HashMap<>();
         estimacionDao.findEstimacionProyectoTipoTarea(proyecto, tipoTarea).forEach(estimacionProyecto -> {
             Cargo cargo = cargoDao.findById(estimacionProyecto.cargo_id);
-            estimacionesXCargoNative.put(cargo, new EstimacionProyectoTipoTareaXCargo(proyecto, tipoTarea, cargo, estimacionProyecto.precioTotal, estimacionProyecto.duracion));
+            BigDecimal precioXHoraNuevo = estimacionProyecto.precioTotal;
+            BigDecimal cantHorasNueva = TimeUtils.durationToBigDecimal(Duration.ofNanos(estimacionProyecto.duracion));
+            BigDecimal precioTotalNuevo = precioXHoraNuevo.multiply(cantHorasNueva);
+            BigDecimal cantHorasAnterior = estimacionesXCargoNative.get(cargo.getId()) != null ? estimacionesXCargoNative.get(cargo.getId()).cantidadHoras : BigDecimal.ZERO;
+            BigDecimal precioTotalAnterior = estimacionesXCargoNative.get(cargo.getId()) != null ? estimacionesXCargoNative.get(cargo.getId()).precioTotal : BigDecimal.ZERO;
+            estimacionesXCargoNative.put(cargo.getId(), new EstimacionProyectoTipoTareaXCargo(proyecto, tipoTarea, cargo, precioTotalAnterior.add(precioTotalNuevo), cantHorasAnterior.add(cantHorasNueva)));
         });
         return estimacionesXCargoNative;
     }
 
     @Logged
-    public Map<Cargo, EstimacionProyectoTipoTareaXCargo> findEstimacionFechasXCargo(LocalDate ini, LocalDate fin) {
-        Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargoNative = new HashMap<>();
+    public Map<Long, EstimacionProyectoTipoTareaXCargo> findEstimacionFechasXCargo(LocalDate ini, LocalDate fin) {
+        Map<Long, EstimacionProyectoTipoTareaXCargo> estimacionesXCargoNative = new HashMap<>();
         estimacionDao.findAllByFechas(ini, fin).forEach(estimacionProyecto -> {
             Cargo cargo = cargoDao.findById(estimacionProyecto.cargo_id);
             TipoTarea tipoTarea = tipoTareaDao.findById(estimacionProyecto.tipoTarea_id);
             Proyecto proyecto = proyectoDao.findById(estimacionProyecto.proyecto_id);
-            estimacionesXCargoNative.put(cargo, new EstimacionProyectoTipoTareaXCargo(proyecto, tipoTarea, cargo, estimacionProyecto.precioTotal, estimacionProyecto.duracion));
+            BigDecimal precioXHoraNuevo = estimacionProyecto.precioTotal;
+            BigDecimal cantHorasNueva = TimeUtils.durationToBigDecimal(Duration.ofNanos(estimacionProyecto.duracion));
+            BigDecimal precioTotalNuevo = precioXHoraNuevo.multiply(cantHorasNueva);
+            BigDecimal cantHorasAnterior = estimacionesXCargoNative.get(cargo.getId()) != null ? estimacionesXCargoNative.get(cargo.getId()).cantidadHoras : BigDecimal.ZERO;
+            BigDecimal precioTotalAnterior = estimacionesXCargoNative.get(cargo.getId()) != null ? estimacionesXCargoNative.get(cargo.getId()).precioTotal : BigDecimal.ZERO;
+            estimacionesXCargoNative.put(cargo.getId(), new EstimacionProyectoTipoTareaXCargo(proyecto, tipoTarea, cargo, precioTotalAnterior.add(precioTotalNuevo), cantHorasAnterior.add(cantHorasNueva)));
         });
         return estimacionesXCargoNative;
     }
 
     @Logged
-    public Map<Cargo, EstimacionProyectoTipoTareaXCargo> findEstimacionFechasProyectoXCargo(LocalDate ini, LocalDate fin, Proyecto proyecto) {
-        Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargoNative = new HashMap<>();
+    public Map<Long, EstimacionProyectoTipoTareaXCargo> findEstimacionFechasProyectoXCargo(LocalDate ini, LocalDate fin, Proyecto proyecto) {
+        Map<Long, EstimacionProyectoTipoTareaXCargo> estimacionesXCargoNative = new HashMap<>();
         estimacionDao.findAllByFechas(ini, fin).forEach(estimacionProyecto -> {
             Cargo cargo = cargoDao.findById(estimacionProyecto.cargo_id);
             TipoTarea tipoTarea = tipoTareaDao.findById(estimacionProyecto.tipoTarea_id);
-            estimacionesXCargoNative.put(cargo, new EstimacionProyectoTipoTareaXCargo(proyecto, tipoTarea, cargo, estimacionProyecto.precioTotal, estimacionProyecto.duracion));
+            BigDecimal precioXHoraNuevo = estimacionProyecto.precioTotal;
+            BigDecimal cantHorasNueva = TimeUtils.durationToBigDecimal(Duration.ofNanos(estimacionProyecto.duracion));
+            BigDecimal precioTotalNuevo = precioXHoraNuevo.multiply(cantHorasNueva);
+            BigDecimal cantHorasAnterior = estimacionesXCargoNative.get(cargo.getId()) != null ? estimacionesXCargoNative.get(cargo.getId()).cantidadHoras : BigDecimal.ZERO;
+            BigDecimal precioTotalAnterior = estimacionesXCargoNative.get(cargo.getId()) != null ? estimacionesXCargoNative.get(cargo.getId()).precioTotal : BigDecimal.ZERO;
+            estimacionesXCargoNative.put(cargo.getId(), new EstimacionProyectoTipoTareaXCargo(proyecto, tipoTarea, cargo, precioTotalAnterior.add(precioTotalNuevo), cantHorasAnterior.add(cantHorasNueva)));
         });
         return estimacionesXCargoNative;
     }
 
     @Logged
-    public Map<Cargo, EstimacionProyectoTipoTareaXCargo> findEstimacionProyectoXCargo(Proyecto proyecto) {
-        Map<Cargo, EstimacionProyectoTipoTareaXCargo> estimacionesXCargoNative = new HashMap<>();
+    public Map<Long, EstimacionProyectoTipoTareaXCargo> findEstimacionProyectoXCargo(Proyecto proyecto) {
+        Map<Long, EstimacionProyectoTipoTareaXCargo> estimacionesXCargoNative = new HashMap<>();
         estimacionDao.findEstimacionProyecto(proyecto).forEach(estimacionProyecto -> {
             Cargo cargo = cargoDao.findById(estimacionProyecto.cargo_id);
             TipoTarea tipoTarea = tipoTareaDao.findById(estimacionProyecto.tipoTarea_id);
-            estimacionesXCargoNative.put(cargo, new EstimacionProyectoTipoTareaXCargo(proyecto, tipoTarea, cargo, estimacionProyecto.precioTotal, estimacionProyecto.duracion));
+            BigDecimal precioXHoraNuevo = estimacionProyecto.precioTotal;
+            BigDecimal cantHorasNueva = TimeUtils.durationToBigDecimal(Duration.ofNanos(estimacionProyecto.duracion));
+            BigDecimal precioTotalNuevo = precioXHoraNuevo.multiply(cantHorasNueva);
+            BigDecimal cantHorasAnterior = estimacionesXCargoNative.get(cargo.getId()) != null ? estimacionesXCargoNative.get(cargo.getId()).cantidadHoras : BigDecimal.ZERO;
+            BigDecimal precioTotalAnterior = estimacionesXCargoNative.get(cargo.getId()) != null ? estimacionesXCargoNative.get(cargo.getId()).precioTotal : BigDecimal.ZERO;
+            estimacionesXCargoNative.put(cargo.getId(), new EstimacionProyectoTipoTareaXCargo(proyecto, tipoTarea, cargo, precioTotalAnterior.add(precioTotalNuevo), cantHorasAnterior.add(cantHorasNueva)));
         });
         return estimacionesXCargoNative;
     }

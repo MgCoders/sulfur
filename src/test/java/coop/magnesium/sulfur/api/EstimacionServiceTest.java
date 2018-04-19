@@ -131,10 +131,10 @@ public class EstimacionServiceTest {
     @Test
     @InSequence(4)
     public void consulta1() {
-        estimacionDao.findEstimacionProyectoTipoTareaXCargo(this.proyecto, this.tipoTarea).forEach((key, value) -> {
-            assertEquals(this.cargo.getId(),value.cargo.getId());
-            assertEquals(new BigDecimal(9.25).setScale(2), value.cantidadHoras);
-            assertEquals(new BigDecimal(310).setScale(2), value.precioTotal);
+        estimacionDao.findEstimacionProyectoTipoTareaXCargo(this.proyecto, this.tipoTarea).values().forEach(estimacionProyectoTipoTareaXCargo -> {
+            assertEquals(this.cargo.getId(), estimacionProyectoTipoTareaXCargo.getCargo().getId());
+            assertEquals(new BigDecimal(9.25).setScale(2), estimacionProyectoTipoTareaXCargo.cantidadHoras.setScale(2));
+            assertEquals(new BigDecimal(1477.50).setScale(2), estimacionProyectoTipoTareaXCargo.precioTotal.setScale(2));
         });
 
     }
@@ -156,10 +156,10 @@ public class EstimacionServiceTest {
     @Test
     @InSequence(6)
     public void consulta3() {
-        estimacionDao.findEstimacionProyectoXCargo(this.proyecto).forEach((key, value) -> {
-            assertEquals(this.cargo.getId(), value.cargo.getId());
-            assertEquals(new BigDecimal(9.25).setScale(2), value.cantidadHoras);
-            assertEquals(new BigDecimal(310).setScale(2), value.precioTotal);
+        estimacionDao.findEstimacionProyectoXCargo(this.proyecto).values().forEach(estimacionProyectoTipoTareaXCargo -> {
+            assertEquals(this.cargo.getId(), estimacionProyectoTipoTareaXCargo.cargo.getId());
+            assertEquals(new BigDecimal(9.25).setScale(2), estimacionProyectoTipoTareaXCargo.cantidadHoras.setScale(2));
+            assertEquals(new BigDecimal(1477.50).setScale(2), estimacionProyectoTipoTareaXCargo.precioTotal.setScale(2));
         });
 
     }
@@ -167,10 +167,10 @@ public class EstimacionServiceTest {
     @Test
     @InSequence(7)
     public void consulta4() {
-        estimacionDao.findEstimacionFechasXCargo(LocalDate.of(2018, 1, 1), LocalDate.now()).forEach((key, value) -> {
-            assertEquals(this.cargo.getId(), value.cargo.getId());
-            assertEquals(new BigDecimal(9.25).setScale(2), value.cantidadHoras);
-            assertEquals(new BigDecimal(310).setScale(2), value.precioTotal);
+        estimacionDao.findEstimacionFechasXCargo(LocalDate.of(2018, 1, 1), LocalDate.now()).values().forEach(estimacionProyectoTipoTareaXCargo -> {
+            assertEquals(this.cargo.getId(), estimacionProyectoTipoTareaXCargo.cargo.getId());
+            assertEquals(new BigDecimal(9.25).setScale(2), estimacionProyectoTipoTareaXCargo.cantidadHoras.setScale(2));
+            assertEquals(new BigDecimal(1477.50).setScale(2), estimacionProyectoTipoTareaXCargo.precioTotal.setScale(2));
         });
 
     }
