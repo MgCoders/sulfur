@@ -2,6 +2,7 @@ package coop.magnesium.sulfur.db.dao;
 
 import coop.magnesium.sulfur.api.dto.HoraCompletaReporte1;
 import coop.magnesium.sulfur.api.dto.HoraCompletaReporte2;
+import coop.magnesium.sulfur.api.dto.HoraCompletaReporte3;
 import coop.magnesium.sulfur.db.entities.*;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdMultipleResultsException;
 
@@ -135,6 +136,35 @@ public class HoraDao extends AbstractDao<Hora, Long> {
                         "  ca.id,\n" +
                         "  h.dia\n" +
                         "ORDER BY co.cargo_id;", "HoraCompletaReporte1");
+        query.setParameter("ini", ini);
+        query.setParameter("fin", fin);
+        return query.getResultList();
+    }
+
+    public List<HoraCompletaReporte3> findHorasByFechasXCargoProyecto(LocalDate ini, LocalDate fin) {
+        Query query = em.createNativeQuery(
+                "SELECT\n" +
+                        "  p.id             proyecto_id,\n" +
+                        "  ca.id            cargo_id,\n" +
+                        "  sum(hd.duracion) duracion,\n" +
+                        "  h.dia            dia\n" +
+                        "FROM horaDetalle hd,\n" +
+                        "  Colaborador co,\n" +
+                        "  Proyecto p,\n" +
+                        "  TipoTarea ta,\n" +
+                        "  hora h,\n" +
+                        "  Cargo ca\n" +
+                        "WHERE hd.hora_id = h.id\n" +
+                        "      AND co.id = h.colaborador_id\n" +
+                        "      AND hd.tipoTarea_id = ta.id\n" +
+                        "      AND hd.proyecto_id = p.id\n" +
+                        "      AND ca.id = hd.cargo_id\n" +
+                        "      AND h.dia >= :ini AND h.dia <= :fin\n" +
+                        "GROUP BY\n" +
+                        "  p.id,\n" +
+                        "  ca.id,\n" +
+                        "  h.dia\n" +
+                        "ORDER BY ca.id;", "HoraCompletaReporte3");
         query.setParameter("ini", ini);
         query.setParameter("fin", fin);
         return query.getResultList();

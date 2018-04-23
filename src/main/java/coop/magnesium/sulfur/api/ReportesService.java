@@ -4,6 +4,7 @@ package coop.magnesium.sulfur.api;
 import coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.api.dto.ReporteHoras1;
 import coop.magnesium.sulfur.api.dto.ReporteHoras2;
+import coop.magnesium.sulfur.api.dto.ReporteHoras3;
 import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
 import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.*;
@@ -128,6 +129,28 @@ public class ReportesService {
 
             List<ReporteHoras1> reporteHoras2List = reportesDao.reporteHoras2Fechas(fechaIni, fechaFin);
             return Response.ok(reporteHoras2List).build();
+
+
+        } catch (Exception e) {
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("horas/proyectos/fechas/{fecha_ini}/{fecha_fin}")
+    @JWTTokenNeeded
+    @RoleNeeded({Role.ADMIN})
+    @Logged
+    @ApiOperation(value = "Reporte de horas cargadas por fechas, proyectos y cargos", response = ReporteHoras3.class, responseContainer = "List")
+    public Response reporte3Fechas(@PathParam("fecha_ini") String fechaIniString,
+                                   @PathParam("fecha_fin") String fechaFinString) {
+        try {
+
+            LocalDate fechaIni = LocalDate.parse(fechaIniString, formatter);
+            LocalDate fechaFin = LocalDate.parse(fechaFinString, formatter);
+
+            List<ReporteHoras3> reporteHoras3List = reportesDao.reporteHoras3FechaXCargoProyecto(fechaIni, fechaFin);
+            return Response.ok(reporteHoras3List).build();
 
 
         } catch (Exception e) {
