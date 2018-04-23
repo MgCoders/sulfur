@@ -3,6 +3,7 @@ package coop.magnesium.sulfur.db.dao;
 import coop.magnesium.sulfur.api.dto.EstimacionProyectoTipoTareaXCargo;
 import coop.magnesium.sulfur.api.dto.ReporteHoras1;
 import coop.magnesium.sulfur.api.dto.ReporteHoras2;
+import coop.magnesium.sulfur.api.dto.ReporteHoras3;
 import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.Proyecto;
 import coop.magnesium.sulfur.db.entities.TipoTarea;
@@ -33,6 +34,8 @@ public class ReportesDao {
     CargoDao cargoDao;
     @Inject
     ColaboradorDao colaboradorDao;
+    @Inject
+    ProyectoDao proyectoDao;
     @EJB
     private EstimacionDao estimacionDao;
     @EJB
@@ -301,6 +304,72 @@ public class ReportesDao {
 
         result.add(filaTotal);
         //result.forEach(reporteHoras2 -> logger.info(reporteHoras2.toString()));
+        return result;
+    }
+
+    /*
+     * Reporte de horas por fechas por Cargo y Proyecto
+     */
+    public List<ReporteHoras3> reporteHoras3FechaXCargoProyecto(LocalDate ini, LocalDate fin) {
+
+        //Aca va el resultado
+        Map<Long, Map<Long, ReporteHoras3>> reporteXCargo = new HashMap<>(); //Clave cargo
+        cargoDao.findAll().stream().forEach(cargo -> {
+            reporteXCargo.put(cargo.getId(), new HashMap<>()); //Clave proyecto
+        });
+
+        //Aca voy a buscar el precio hora e ir consolidando las diferentes filas con mismo proyecto.
+        horaDao.findHorasByFechasXCargoProyecto(ini, fin).forEach(horaCompleta -> {
+            //logger.info(horaCompleta.toString());
+            Cargo cargo = cargoDao.findById(horaCompleta.cargo_id);
+            Proyecto proyecto = proyectoDao.findById(horaCompleta.proyecto_id);
+
+            Map<Long, ReporteHoras3> reportesXProyecto = reporteXCargo.get(horaCompleta.cargo_id);
+            reportesXProyecto.computeIfAbsent(horaCompleta.proyecto_id, proyecto_id -> reportesXProyecto.put(proyecto_id, new ReporteHoras3(BigDecimal.ZERO, BigDecimal.ZERO, cargo, proyecto)));
+
+            BigDecimal costoXHora = horaDao.findPrecioHoraCargo(cargo, horaCompleta.dia);
+            BigDecimal cantHoras = TimeUtils.durationToBigDecimal(Duration.ofNanos(horaCompleta.duracion));
+            BigDecimal costoHoras = costoXHora.multiply(cantHoras);
+            reportesXProyecto.get(horaCompleta.proyecto_id).cantidadHoras = reportesXProyecto.get(horaCompleta.proyecto_id).cantidadHoras.add(cantHoras);
+            reportesXProyecto.get(horaCompleta.proyecto_id).precioTotal = reportesXProyecto.get(horaCompleta.proyecto_id).precioTotal.add(costoHoras);
+        });
+
+
+        //Resultados en lista
+        List<ReporteHoras3> result = new ArrayList<>();
+        reporteXCargo.entrySet().forEach(entrySet -> {
+            Cargo cargo = cargoDao.findById(entrySet.getKey());
+            Map<Long, ReporteHoras3> reporteXProyecto = entrySet.getValue();
+            //Agrego todos los proyectos para este cargo
+            result.addAll(reporteXProyecto.values());
+            //Agrego una fila de totales parciales
+            if (!reporteXProyecto.values().isEmpty()) {
+                ReporteHoras3 filaTotalParcial = new ReporteHoras3(BigDecimal.ZERO, BigDecimal.ZERO, cargo, null);
+                reporteXProyecto.values().stream().reduce((r1, r2) -> new ReporteHoras3(
+                        r1.cantidadHoras.add(r2.cantidadHoras),
+                        r1.precioTotal.add(r2.precioTotal),
+                        null, null)).ifPresent(reporteHoras2 -> {
+                    filaTotalParcial.precioTotal = reporteHoras2.precioTotal;
+                    filaTotalParcial.cantidadHoras = reporteHoras2.cantidadHoras;
+                });
+                result.add(filaTotalParcial);
+            }
+        });
+
+        //Ordeno lista por precio hora de cargo al dia de hoy
+        result.sort(comparing(reporteHoras2 -> horaDao.findPrecioHoraCargo(reporteHoras2.cargo, LocalDate.now()), reverseOrder()));
+
+        //Filas total
+        ReporteHoras3 filaTotal = new ReporteHoras3(BigDecimal.ZERO, BigDecimal.ZERO, null, null);
+        result.stream().filter(reporteHoras3 -> reporteHoras3.proyecto == null).reduce((r1, r2) -> new ReporteHoras3(
+                r1.cantidadHoras.add(r2.cantidadHoras),
+                r1.precioTotal.add(r2.precioTotal),
+                null, null)).ifPresent(reporteHoras2 -> {
+            filaTotal.precioTotal = reporteHoras2.precioTotal;
+            filaTotal.cantidadHoras = reporteHoras2.cantidadHoras;
+        });
+
+        result.add(filaTotal);
         return result;
     }
 

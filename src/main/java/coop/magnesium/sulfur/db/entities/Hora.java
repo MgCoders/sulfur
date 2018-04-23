@@ -15,6 +15,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import coop.magnesium.sulfur.api.dto.HoraCompletaReporte1;
 import coop.magnesium.sulfur.api.dto.HoraCompletaReporte2;
+import coop.magnesium.sulfur.api.dto.HoraCompletaReporte3;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -49,6 +50,16 @@ import java.util.Set;
                 @ConstructorResult(targetClass = HoraCompletaReporte2.class,
                         columns = {
                                 @ColumnResult(name = "colaborador_id", type = Long.class),
+                                @ColumnResult(name = "cargo_id", type = Long.class),
+                                @ColumnResult(name = "duracion", type = Long.class),
+                                @ColumnResult(name = "dia", type = LocalDate.class)
+                        })
+
+        }),
+        @SqlResultSetMapping(name = "HoraCompletaReporte3", classes = {
+                @ConstructorResult(targetClass = HoraCompletaReporte3.class,
+                        columns = {
+                                @ColumnResult(name = "proyecto_id", type = Long.class),
                                 @ColumnResult(name = "cargo_id", type = Long.class),
                                 @ColumnResult(name = "duracion", type = Long.class),
                                 @ColumnResult(name = "dia", type = LocalDate.class)

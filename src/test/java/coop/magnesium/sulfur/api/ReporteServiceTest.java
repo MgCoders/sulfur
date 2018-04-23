@@ -3,10 +3,7 @@ package coop.magnesium.sulfur.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import coop.magnesium.sulfur.api.dto.HoraCompletaReporte1;
-import coop.magnesium.sulfur.api.dto.HorasProyectoXCargo;
-import coop.magnesium.sulfur.api.dto.ReporteHoras1;
-import coop.magnesium.sulfur.api.dto.ReporteHoras2;
+import coop.magnesium.sulfur.api.dto.*;
 import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
 import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.*;
@@ -331,6 +328,36 @@ public class ReporteServiceTest {
             //Fila total
             if (reporteHoras1.colaborador == null) {
                 assertEquals(new BigDecimal(110.33).setScale(2, RoundingMode.HALF_DOWN), reporteHoras1.cantidadHoras);
+
+            }
+        });
+
+    }
+
+    @Test
+    @InSequence(13)
+    @RunAsClient
+    public void getReporteFechasXCargoProyectos(@ArquillianResteasyResource final WebTarget webTarget) {
+        final Response response = webTarget
+                .path("/reportes/horas/proyectos/fechas/01-01-2018/01-01-2019")
+                .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "ADMIN:2")
+                .get();
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        List<ReporteHoras3> horaList = response.readEntity(new GenericType<List<ReporteHoras3>>() {
+        });
+        assertEquals(7, horaList.size());
+        horaList.forEach(reporteHoras1 -> {
+            //Filas totales parciales
+            if (reporteHoras1.proyecto == null && reporteHoras1.cargo != null && reporteHoras1.cargo.getId().equals(cargo1.getId())) {
+                assertEquals(new BigDecimal(65.00).setScale(2, RoundingMode.HALF_DOWN), reporteHoras1.cantidadHoras);
+            }
+            if (reporteHoras1.proyecto == null && reporteHoras1.cargo != null && reporteHoras1.cargo.getId().equals(cargo2.getId())) {
+                assertEquals(new BigDecimal(45.20).setScale(2, RoundingMode.HALF_DOWN), reporteHoras1.cantidadHoras);
+            }
+            //Fila total
+            if (reporteHoras1.cargo == null) {
+                assertEquals(new BigDecimal(110.34).setScale(2, RoundingMode.HALF_DOWN), reporteHoras1.cantidadHoras);
 
             }
         });
