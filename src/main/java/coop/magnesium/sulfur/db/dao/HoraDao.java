@@ -183,7 +183,7 @@ public class HoraDao extends AbstractDao<Hora, Long> {
                         "  Cargo ca\n" +
                         "WHERE hd.hora_id = h.id\n" +
                         "      AND co.id = h.colaborador_id\n" +
-                        "      AND ca.id = co.cargo_id\n" +
+                        "      AND ca.id = hd.cargo_id\n" +
                         "      AND h.dia >= :ini AND h.dia <= :fin\n" +
                         "GROUP BY\n" +
                         "  co.id,\n" +
