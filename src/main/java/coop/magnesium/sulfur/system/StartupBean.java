@@ -85,6 +85,12 @@ public class StartupBean {
         if (configuracionDao.getMailPort() == null) {
             configuracionDao.setMailHost("ip-172-31-6-242");
         }
+        if (configuracionDao.getProjectName() == null) {
+            configuracionDao.setProjectName("MMMM");
+        }
+        if (configuracionDao.getProjectLogo() == null) {
+            configuracionDao.setProjectLogo("https://fffff.com");
+        }
     }
 
     public void putRecuperacionPassword(RecuperacionPassword recuperacionPassword) {
