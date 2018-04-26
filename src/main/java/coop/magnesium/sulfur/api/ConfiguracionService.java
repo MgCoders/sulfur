@@ -63,6 +63,62 @@ public class ConfiguracionService {
     }
 
     @POST
+    @Path("project/name")
+    @Logged
+    @JWTTokenNeeded
+    @RoleNeeded({Role.ADMIN})
+    @ApiOperation(value = "Set project name", response = Response.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Error interno")})
+    public Response setProjectName(String projectName) {
+        try {
+            configuracionDao.setProjectName(projectName);
+            return Response.status(Response.Status.OK).build();
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+
+    @GET
+    @Path("project/name")
+    @JWTTokenNeeded
+    @RoleNeeded({Role.ADMIN})
+    @ApiOperation(value = "Get project name", response = Response.class)
+    public Response getProjectName() {
+        return Response.ok(configuracionDao.getProjectName()).build();
+    }
+
+    @POST
+    @Path("project/logo")
+    @Logged
+    @JWTTokenNeeded
+    @RoleNeeded({Role.ADMIN})
+    @ApiOperation(value = "Set project logo", response = Response.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Error interno")})
+    public Response setProjectLogo(String projectLogo) {
+        try {
+            configuracionDao.setProjectLogo(projectLogo);
+            return Response.status(Response.Status.OK).build();
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+
+    @GET
+    @Path("project/logo")
+    @JWTTokenNeeded
+    @RoleNeeded({Role.ADMIN})
+    @ApiOperation(value = "Get project logo", response = Response.class)
+    public Response getProjectLogo() {
+        return Response.ok(configuracionDao.getProjectName()).build();
+    }
+
+    @POST
     @Path("periodicidad")
     @Logged
     @JWTTokenNeeded
