@@ -3,7 +3,9 @@ package coop.magnesium.sulfur.api;
 
 import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
 import coop.magnesium.sulfur.api.utils.RoleNeeded;
-import coop.magnesium.sulfur.db.dao.*;
+import coop.magnesium.sulfur.db.dao.CargoDao;
+import coop.magnesium.sulfur.db.dao.ColaboradorDao;
+import coop.magnesium.sulfur.db.dao.HoraDao;
 import coop.magnesium.sulfur.db.entities.*;
 import coop.magnesium.sulfur.utils.Logged;
 import coop.magnesium.sulfur.utils.ex.MagnesiumException;
@@ -183,7 +185,6 @@ public class HoraService {
         return Response.ok(hora).build();
     }
 
-    @Deprecated
     @PUT
     @Path("{id}")
     @JWTTokenNeeded
@@ -222,6 +223,42 @@ public class HoraService {
             hora.cacularSubtotalDetalle();
             hora = horaDao.save(hora);
             notificacionEvent.fire(new Notificacion(TipoNotificacion.EDICION_HORA, hora.getColaborador(), "Edición de horas", hora));
+
+            return Response.ok(hora).build();
+
+        } catch (MagnesiumNotFoundException e) {
+            logger.warning(e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (MagnesiumSecurityException e) {
+            logger.warning(e.getMessage());
+            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
+            return Response.serverError().entity(e.getMessage()).build();
+        }
+    }
+
+    @DELETE
+    @Path("{id}")
+    @JWTTokenNeeded
+    @RoleNeeded({Role.USER, Role.ADMIN})
+    @ApiOperation(value = "Borrar hora", response = Hora.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 304, message = "Error: objeto no borrado")})
+    public Response delete(@PathParam("id") Long id, @Context SecurityContext securityContext) {
+        try {
+            Hora hora = horaDao.findById(id);
+            if (hora == null) throw new MagnesiumNotFoundException("Hora no encontrada");
+
+            Colaborador colaborador = colaboradorDao.findById(hora.getColaborador().getId());
+            if (colaborador == null) throw new MagnesiumNotFoundException("Colaborador no encontrado");
+
+            SulfurUser usuarioLogueado = (SulfurUser) securityContext.getUserPrincipal();
+            Role rolUsuarioLogueado = Role.valueOf(usuarioLogueado.getRole());
+            if (!rolUsuarioLogueado.equals(Role.ADMIN) && !usuarioLogueado.getColaboradorId().equals(colaborador.getId()))
+                throw new MagnesiumSecurityException("Colaborador no coincide");
+
+            horaDao.deleteCascade(hora);
 
             return Response.ok(hora).build();
 
