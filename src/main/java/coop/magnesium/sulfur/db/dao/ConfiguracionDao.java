@@ -115,6 +115,42 @@ public class ConfiguracionDao extends AbstractDao<Configuracion, Long> {
         }
     }
 
+    public String getProjectName() {
+        List<Configuracion> configuracionList = findAllByClave(TipoConfiguracion.PROJECT_NAME);
+        if (!configuracionList.isEmpty()) {
+            return configuracionList.get(0).getValor();
+        } else {
+            return null;
+        }
+    }
+
+    public void setProjectName(String proyectName) {
+        Optional<Configuracion> configuracion = findAllByClave(TipoConfiguracion.PROJECT_NAME).stream().findFirst();
+        if (configuracion.isPresent()) {
+            configuracion.get().setValor(proyectName);
+        } else {
+            save(new Configuracion(TipoConfiguracion.PROJECT_NAME, proyectName));
+        }
+    }
+
+    public String getProjectLogo() {
+        List<Configuracion> configuracionList = findAllByClave(TipoConfiguracion.LOGO_URL);
+        if (!configuracionList.isEmpty()) {
+            return configuracionList.get(0).getValor();
+        } else {
+            return null;
+        }
+    }
+
+    public void setProjectLogo(String proyectName) {
+        Optional<Configuracion> configuracion = findAllByClave(TipoConfiguracion.LOGO_URL).stream().findFirst();
+        if (configuracion.isPresent()) {
+            configuracion.get().setValor(proyectName);
+        } else {
+            save(new Configuracion(TipoConfiguracion.LOGO_URL, proyectName));
+        }
+    }
+
     public void setMailHost(String mailHost) {
         Optional<Configuracion> configuracion = findAllByClave(TipoConfiguracion.MAIL_HOST).stream().findFirst();
         if (configuracion.isPresent()) {

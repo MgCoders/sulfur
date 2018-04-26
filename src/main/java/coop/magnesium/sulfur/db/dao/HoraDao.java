@@ -4,9 +4,11 @@ import coop.magnesium.sulfur.api.dto.HoraCompletaReporte1;
 import coop.magnesium.sulfur.api.dto.HoraCompletaReporte2;
 import coop.magnesium.sulfur.api.dto.HoraCompletaReporte3;
 import coop.magnesium.sulfur.db.entities.*;
+import coop.magnesium.sulfur.utils.Logged;
 import coop.magnesium.sulfur.utils.ex.MagnesiumBdMultipleResultsException;
 
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -17,6 +19,7 @@ import javax.persistence.criteria.Root;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by rsperoni on 28/10/17.
@@ -36,6 +39,9 @@ public class HoraDao extends AbstractDao<Hora, Long> {
     public EntityManager getEntityManager() {
         return em;
     }
+
+    @Inject
+    Logger logger;
 
     /**
      * Devuelva horas de colaborador entre fechas ini y fin.
@@ -183,7 +189,7 @@ public class HoraDao extends AbstractDao<Hora, Long> {
                         "  Cargo ca\n" +
                         "WHERE hd.hora_id = h.id\n" +
                         "      AND co.id = h.colaborador_id\n" +
-                        "      AND ca.id = co.cargo_id\n" +
+                        "      AND ca.id = hd.cargo_id\n" +
                         "      AND h.dia >= :ini AND h.dia <= :fin\n" +
                         "GROUP BY\n" +
                         "  co.id,\n" +
@@ -316,4 +322,11 @@ public class HoraDao extends AbstractDao<Hora, Long> {
     }
 
 
+    @Logged
+    public void deleteCascade(Hora hora) {
+        int not = em.createQuery("DELETE FROM Notificacion WHERE hora_id = :id").setParameter("id", hora.getId()).executeUpdate();
+        int horaDet = em.createQuery("DELETE FROM HoraDetalle WHERE hora_id = :id").setParameter("id", hora.getId()).executeUpdate();
+        int horaD = em.createQuery("DELETE FROM Hora WHERE id = :id").setParameter("id", hora.getId()).executeUpdate();
+        logger.info("Hora borrada: " + horaD + " con " + horaDet + " hora detalle y " + not + " notificacion");
+    }
 }

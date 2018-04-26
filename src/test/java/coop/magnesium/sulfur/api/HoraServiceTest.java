@@ -206,7 +206,7 @@ public class HoraServiceTest {
     @Test
     @InSequence(6)
     @RunAsClient
-    public void getHorasAdminBien(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
+    public void getHorasAdminBien(@ArquillianResteasyResource final WebTarget webTarget) {
 
 
         final Response response = webTarget
@@ -224,7 +224,7 @@ public class HoraServiceTest {
     @Test
     @InSequence(7)
     @RunAsClient
-    public void getHorasUserMal(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
+    public void getHorasUserMal(@ArquillianResteasyResource final WebTarget webTarget) {
 
 
         final Response response = webTarget
@@ -239,7 +239,7 @@ public class HoraServiceTest {
     @Test
     @InSequence(8)
     @RunAsClient
-    public void getHorasUserMal2(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
+    public void getHorasUserMal2(@ArquillianResteasyResource final WebTarget webTarget) {
 
 
         final Response response = webTarget
@@ -254,7 +254,7 @@ public class HoraServiceTest {
     @Test
     @InSequence(9)
     @RunAsClient
-    public void getHorasUserBien(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
+    public void getHorasUserBien(@ArquillianResteasyResource final WebTarget webTarget) {
 
 
         final Response response = webTarget
@@ -272,7 +272,7 @@ public class HoraServiceTest {
     @Test
     @InSequence(10)
     @RunAsClient
-    public void getHorasUserBien2(@ArquillianResteasyResource final WebTarget webTarget) throws IOException {
+    public void getHorasUserBien2(@ArquillianResteasyResource final WebTarget webTarget) {
 
 
         final Response response = webTarget
@@ -341,6 +341,42 @@ public class HoraServiceTest {
         assertEquals(2, horaCreada.getHoraDetalleList().size());
         assertNotEquals(horaCreada.getSubtotalDetalles(), horaCreada.getSubtotal());
         assertEquals(false, horaCreada.isCompleta());
+    }
+
+    @Test
+    @InSequence(13)
+    @RunAsClient
+    public void borrarHoras(@ArquillianResteasyResource final WebTarget webTarget) {
+        final Response response = webTarget
+                .path("/horas/01-01-2011/01-01-2018")
+                .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "ADMIN:1")
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        List<Hora> horaList = response.readEntity(new GenericType<List<Hora>>() {
+        });
+        assertEquals(2, horaList.size());
+
+        horaList.forEach(hora -> {
+            final Response res = webTarget
+                    .path("/horas/" + hora.getId())
+                    .request(MediaType.APPLICATION_JSON)
+                    .header("AUTHORIZATION", "ADMIN:1")
+                    .delete();
+        });
+
+        final Response finalResponse = webTarget
+                .path("/horas/01-01-2011/01-01-2018")
+                .request(MediaType.APPLICATION_JSON)
+                .header("AUTHORIZATION", "ADMIN:1")
+                .get();
+
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        List<Hora> horaListFinal = finalResponse.readEntity(new GenericType<List<Hora>>() {
+        });
+        assertEquals(0, horaListFinal.size());
+
     }
 
 }

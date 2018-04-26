@@ -11,5 +11,7 @@ public enum TipoConfiguracion {
     MAIL_FROM,
     MAIL_PASS,
     MAIL_HOST,
-    MAIL_PORT
+    MAIL_PORT,
+    PROJECT_NAME,
+    LOGO_URL
 }
