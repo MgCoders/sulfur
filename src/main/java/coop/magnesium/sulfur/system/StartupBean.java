@@ -124,7 +124,7 @@ public class StartupBean {
         }
     }
 
-    @Schedule(hour = "*/72", info = "alertaHorasSinCargar", persistent = false)
+    @Schedule(dayOfWeek = "Mon,Wed,Fri", hour = "9", info = "alertaHorasSinCargar", persistent = false)
     public void alertaHorasSinCargar() {
         //Solo si soy master
         if (configuracionDao.getNodoMaster().equals(jbossNodeName)) {

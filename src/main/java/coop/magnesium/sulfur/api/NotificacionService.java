@@ -8,17 +8,20 @@ import coop.magnesium.sulfur.db.dao.NotificacionDao;
 import coop.magnesium.sulfur.db.entities.Colaborador;
 import coop.magnesium.sulfur.db.entities.Notificacion;
 import coop.magnesium.sulfur.db.entities.Role;
-import coop.magnesium.sulfur.system.StartupBean;
+import coop.magnesium.sulfur.utils.Logged;
 import coop.magnesium.sulfur.utils.ex.MagnesiumNotFoundException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 import javax.ejb.EJB;
+import javax.ejb.Local;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.logging.Logger;
@@ -44,8 +47,6 @@ public class NotificacionService {
     private NotificacionDao notificacionDao;
     @EJB
     private ColaboradorDao colaboradorDao;
-    @EJB
-    private StartupBean startupBean;
 
 
     @GET
@@ -62,6 +63,7 @@ public class NotificacionService {
     @GET
     @Path("colaborador/{colaborador_id}/{fecha_ini}/{fecha_fin}")
     @JWTTokenNeeded
+    @Logged
     @RoleNeeded({Role.ADMIN, Role.USER})
     @ApiOperation(value = "Get notificaciones por colaborador", response = Notificacion.class, responseContainer = "List")
     public Response findByColaborador(@PathParam("colaborador_id") Long colaborador_id,
@@ -72,29 +74,18 @@ public class NotificacionService {
             if (colaborador == null)
                 throw new MagnesiumNotFoundException("colaborador no encontrado");
 
-            LocalDateTime fechaIni = LocalDateTime.parse(fechaIniString, formatter);
-            LocalDateTime fechaFin = LocalDateTime.parse(fechaFinString, formatter);
+            LocalDate fechaIni = LocalDate.parse(fechaIniString, formatter);
+            LocalDate fechaFin = LocalDate.parse(fechaFinString, formatter);
+            LocalDateTime fechaHoraIni = LocalDateTime.of(fechaIni,LocalTime.MAX);
+            LocalDateTime fechaHoraFin = LocalDateTime.of(fechaFin, LocalTime.MIN);
 
-            List<Notificacion> notificacionList = notificacionDao.findAllByColaborador(colaborador, fechaIni, fechaFin);
+            List<Notificacion> notificacionList = notificacionDao.findAllByColaborador(colaborador, fechaHoraIni, fechaHoraFin);
             return Response.ok(notificacionList).build();
         } catch (MagnesiumNotFoundException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (Exception e) {
-            return Response.serverError().entity(e.getMessage()).build();
-        }
-    }
-
-    @PUT
-    @Path("alertas/horas-sin-cargar")
-    @JWTTokenNeeded
-    @RoleNeeded({Role.ADMIN})
-    @ApiOperation(value = "Disparar alerta horas sin cargar", response = Response.class)
-    public Response findByColaborador() {
-        try {
-            startupBean.alertaHorasSinCargar();
-            return Response.ok().build();
-        } catch (Exception e) {
-            return Response.serverError().entity(e.getMessage()).build();
+            e.printStackTrace();
+            return Response.serverError().entity(e).build();
         }
     }
 
