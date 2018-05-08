@@ -115,7 +115,7 @@ public class ConfiguracionService {
     @RoleNeeded({Role.ADMIN})
     @ApiOperation(value = "Get project logo", response = Response.class)
     public Response getProjectLogo() {
-        return Response.ok(configuracionDao.getProjectName()).build();
+        return Response.ok(configuracionDao.getProjectLogo()).build();
     }
 
     @POST
