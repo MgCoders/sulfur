@@ -83,8 +83,6 @@ public class ConfiguracionService {
 
     @GET
     @Path("project/name")
-    @JWTTokenNeeded
-    @RoleNeeded({Role.ADMIN})
     @ApiOperation(value = "Get project name", response = Response.class)
     public Response getProjectName() {
         return Response.ok(configuracionDao.getProjectName()).build();
@@ -111,8 +109,6 @@ public class ConfiguracionService {
 
     @GET
     @Path("project/logo")
-    @JWTTokenNeeded
-    @RoleNeeded({Role.ADMIN})
     @ApiOperation(value = "Get project logo", response = Response.class)
     public Response getProjectLogo() {
         return Response.ok(configuracionDao.getProjectLogo()).build();
