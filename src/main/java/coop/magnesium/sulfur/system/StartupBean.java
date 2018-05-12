@@ -170,7 +170,10 @@ public class StartupBean {
 
     @Schedule(hour = "*/72", info = "limpiarNotificacionesAntiguas", persistent = false)
     public void limpiarNotificacionesAntiguas(){
-        notificacionDao.findAll(LocalDateTime.now().minusDays(100), LocalDateTime.now().minusDays(30)).forEach(notificacion -> notificacionDao.delete(notificacion));
+        //Solo si soy master
+        if (configuracionDao.getNodoMaster().equals(jbossNodeName)) {
+            notificacionDao.findAll(LocalDateTime.now().minusDays(100), LocalDateTime.now().minusDays(30)).forEach(notificacion -> notificacionDao.delete(notificacion));
+        }
     }
 
 
