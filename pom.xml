@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>magnesium.coop</groupId>
     <artifactId>sulfur-backend</artifactId>
-    <version>1.3</version>
+    <version>1.4</version>
     <packaging>war</packaging>
     <dependencies>
         <dependency>
@@ -146,11 +146,7 @@
             <properties>
                 <jboss.host>127.0.0.1</jboss.host>
                 <hibernate.hbm2ddl.option>update</hibernate.hbm2ddl.option>
-                <jboss.port>8080</jboss.port>
-                <rest.base.path>api</rest.base.path>
-                <rest.base.host>localhost:8080</rest.base.host>
                 <frontend.host>localhost:4200</frontend.host>
-                <frontend.path>/#/extra/new-password?token=</frontend.path>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -161,11 +157,7 @@
             <properties>
                 <jboss.host>https://${url.testing}</jboss.host>
                 <hibernate.hbm2ddl.option>update</hibernate.hbm2ddl.option>
-                <jboss.port>80</jboss.port>
-                <rest.base.path>api</rest.base.path>
                 <rest.base.host>${url.testing}</rest.base.host>
-                <frontend.host>https://marq.magnesium.coop</frontend.host>
-                <frontend.path>/#/extra/new-password?token=</frontend.path>
             </properties>
         </profile>
         <profile>
@@ -173,11 +165,7 @@
             <properties>
                 <jboss.host>https://${url.prod}</jboss.host>
                 <hibernate.hbm2ddl.option>update</hibernate.hbm2ddl.option>
-                <jboss.port>80</jboss.port>
-                <rest.base.path>api</rest.base.path>
                 <rest.base.host>${url.prod}</rest.base.host>
-                <frontend.host>https://marq.magnesium.coop</frontend.host>
-                <frontend.path>/#/extra/new-password?token=</frontend.path>
             </properties>
         </profile>
         <!-- Arquillian WildFly managed profile -->

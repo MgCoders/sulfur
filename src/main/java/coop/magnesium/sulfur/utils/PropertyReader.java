@@ -13,15 +13,11 @@ import java.util.Properties;
 @Dependent
 public class PropertyReader {
 
-    public static final String RANGO_TRACKING_INI = "RANGO_TRACKING_INI";
-    public static final String RANGO_TRACKING_FIN = "RANGO_TRACKING_FIN";
-    public static final String RANGO_TRACKING_START_CODE = "RANGO_TRACKING_START_CODE";
-    public static final String RANGO_TRACKING_END_CODE = "RANGO_TRACKING_END_CODE";
-
     @Produces
     public String jbossNodeName(){
         return System.getProperty("jboss.node.name");
     }
+
 
     @Produces
     @PropertiesFromFile

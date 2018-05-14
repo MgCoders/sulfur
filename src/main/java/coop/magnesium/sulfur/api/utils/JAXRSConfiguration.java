@@ -1,5 +1,7 @@
 package coop.magnesium.sulfur.api.utils;
 
+import coop.magnesium.sulfur.db.dao.ConfiguracionDao;
+import coop.magnesium.sulfur.db.entities.TipoConfiguracion;
 import coop.magnesium.sulfur.utils.PropertiesFromFile;
 import io.swagger.jaxrs.config.BeanConfig;
 
@@ -22,6 +24,9 @@ public class JAXRSConfiguration extends Application {
     @PropertiesFromFile
     Properties endpointsProperties;
 
+    @Inject
+    ConfiguracionDao configuracionDao;
+
     /**
      * Add swagger configuraction
      */
@@ -30,12 +35,12 @@ public class JAXRSConfiguration extends Application {
         BeanConfig beanConfig = new BeanConfig();
         beanConfig.setVersion(endpointsProperties.getProperty("project.version"));
         beanConfig.setSchemes(new String[]{"https"});
-        beanConfig.setHost(endpointsProperties.getProperty("rest.base.host"));
-        beanConfig.setBasePath(endpointsProperties.getProperty("rest.base.path"));
+        beanConfig.setHost(configuracionDao.getStringProperty(TipoConfiguracion.FRONTEND_HOST));
+        beanConfig.setBasePath(configuracionDao.getStringProperty(TipoConfiguracion.FRONTEND_PATH));
         beanConfig.setResourcePackage("coop.magnesium.sulfur.api");
         beanConfig.setDescription(getDescription());
-        beanConfig.setTitle("Sulfur backend");
-        beanConfig.setContact("rsperoni@magnesium.coop");
+        beanConfig.setTitle(configuracionDao.getStringProperty(TipoConfiguracion.PROJECT_NAME));
+        beanConfig.setContact("info@magnesium.coop");
         beanConfig.setScan(true);
         beanConfig.setPrettyPrint(true);
     }

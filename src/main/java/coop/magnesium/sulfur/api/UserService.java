@@ -2,10 +2,8 @@ package coop.magnesium.sulfur.api;
 
 
 import coop.magnesium.sulfur.db.dao.ColaboradorDao;
-import coop.magnesium.sulfur.db.entities.Colaborador;
-import coop.magnesium.sulfur.db.entities.Notificacion;
-import coop.magnesium.sulfur.db.entities.RecuperacionPassword;
-import coop.magnesium.sulfur.db.entities.TipoNotificacion;
+import coop.magnesium.sulfur.db.dao.ConfiguracionDao;
+import coop.magnesium.sulfur.db.entities.*;
 import coop.magnesium.sulfur.system.MailEvent;
 import coop.magnesium.sulfur.system.MailService;
 import coop.magnesium.sulfur.system.StartupBean;
@@ -69,6 +67,8 @@ public class UserService {
     private ColaboradorDao colaboradorDao;
     @EJB
     private StartupBean startupBean;
+    @Inject
+    private ConfiguracionDao configuracionDao;
 
     @POST
     @Path("/login")
@@ -115,7 +115,10 @@ public class UserService {
             if (colaboradorDao.findByEmail(email) == null) throw new ObjectNotFoundException("no existe colaborador");
             RecuperacionPassword recuperacionPassword = new RecuperacionPassword(email, UUID.randomUUID().toString(), LocalDateTime.now().plusHours(1));
             startupBean.putRecuperacionPassword(recuperacionPassword);
-            mailEvent.fire(new MailEvent(Arrays.asList(email), MailService.generarEmailRecuperacionClave(recuperacionPassword.getToken(), endpointsProperties.getProperty("frontend.host"), endpointsProperties.getProperty("frontend.path")), "MARQ: Recuperación de Contraseña"));
+            String projectName = configuracionDao.getStringProperty(TipoConfiguracion.PROJECT_NAME);
+            String frontendHost = configuracionDao.getStringProperty(TipoConfiguracion.FRONTEND_HOST);
+            String frontendPath = configuracionDao.getStringProperty(TipoConfiguracion.FRONTEND_PATH);
+            mailEvent.fire(new MailEvent(Arrays.asList(email), MailService.generarEmailRecuperacionClave(recuperacionPassword.getToken(), frontendHost, frontendPath), projectName + ": Recuperación de Contraseña"));
             logger.info(recuperacionPassword.getToken());
             return Response.ok().build();
         } catch (ObjectNotFoundException e) {
