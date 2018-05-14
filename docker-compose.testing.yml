@@ -12,6 +12,7 @@ services:
        DB_NAME: postgres
        DB_USER: postgres
        DB_PASS: postgres
+       BACKEND_URL: REPLACE_URL_TEST
        LOGSTASH_HOST:
     deploy:
       labels:

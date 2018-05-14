@@ -133,6 +133,48 @@ public class ConfiguracionDao extends AbstractDao<Configuracion, Long> {
         }
     }
 
+    public String getFrotendHost() {
+        List<Configuracion> configuracionList = findAllByClave(TipoConfiguracion.FRONTEND_HOST);
+        if (!configuracionList.isEmpty()) {
+            return configuracionList.get(0).getValor();
+        } else {
+            return null;
+        }
+    }
+
+    public void setStringProperty(String property, TipoConfiguracion tipoConfiguracion) {
+        Optional<Configuracion> configuracion = findAllByClave(tipoConfiguracion).stream().findFirst();
+        if (configuracion.isPresent()) {
+            configuracion.get().setValor(property);
+        } else {
+            save(new Configuracion(tipoConfiguracion, property));
+        }
+    }
+
+    public String getStringProperty(TipoConfiguracion tipoConfiguracion) {
+        List<Configuracion> configuracionList = findAllByClave(tipoConfiguracion);
+        if (!configuracionList.isEmpty()) {
+            return configuracionList.get(0).getValor();
+        } else {
+            return null;
+        }
+    }
+
+    public void ifNullSetStringProperty(TipoConfiguracion tipoConfiguracion, String value) {
+        if (configuracionDao.getStringProperty(tipoConfiguracion) == null) {
+            configuracionDao.setStringProperty(value, tipoConfiguracion);
+        }
+    }
+
+    public void setFrontendHost(String frontendHost) {
+        Optional<Configuracion> configuracion = findAllByClave(TipoConfiguracion.FRONTEND_HOST).stream().findFirst();
+        if (configuracion.isPresent()) {
+            configuracion.get().setValor(frontendHost);
+        } else {
+            save(new Configuracion(TipoConfiguracion.FRONTEND_HOST, frontendHost));
+        }
+    }
+
     public String getProjectLogo() {
         List<Configuracion> configuracionList = findAllByClave(TipoConfiguracion.LOGO_URL);
         if (!configuracionList.isEmpty()) {

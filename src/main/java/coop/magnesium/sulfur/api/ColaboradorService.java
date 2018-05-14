@@ -76,7 +76,8 @@ public class ColaboradorService {
             }
             colaborador = colaboradorDao.save(colaborador);
             String projectName = configuracionDao.getProjectName();
-            mailEvent.fire(new MailEvent(Arrays.asList(colaborador.getEmail()), MailService.generarEmailNuevoUsuario(endpointsProperties.getProperty("frontend.host"), projectName), projectName + ": Nuevo Usuario"));
+            String frontendHost = configuracionDao.getFrotendHost();
+            mailEvent.fire(new MailEvent(Arrays.asList(colaborador.getEmail()), MailService.generarEmailNuevoUsuario(frontendHost, projectName), projectName + ": Nuevo Usuario"));
             return Response.status(Response.Status.CREATED).entity(colaborador).build();
         } catch (MagnesiumBdMultipleResultsException | MagnesiumBdAlredyExistsException exists) {
             logger.warning("Email ya existe");

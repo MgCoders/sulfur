@@ -3,6 +3,7 @@ package coop.magnesium.sulfur.system;
 import coop.magnesium.sulfur.db.dao.*;
 import coop.magnesium.sulfur.db.entities.Notificacion;
 import coop.magnesium.sulfur.db.entities.RecuperacionPassword;
+import coop.magnesium.sulfur.db.entities.TipoConfiguracion;
 import coop.magnesium.sulfur.db.entities.TipoNotificacion;
 
 import javax.annotation.PostConstruct;
@@ -91,6 +92,9 @@ public class StartupBean {
         if (configuracionDao.getProjectLogo() == null) {
             configuracionDao.setProjectLogo("https://fffff.com");
         }
+        configuracionDao.ifNullSetStringProperty(TipoConfiguracion.FRONTEND_HOST, "https://fffff.com");
+        configuracionDao.ifNullSetStringProperty(TipoConfiguracion.FRONTEND_PATH, "/#/extra/new-password?token=");
+        configuracionDao.ifNullSetStringProperty(TipoConfiguracion.REST_BASE_PATH, "api");
     }
 
     public void putRecuperacionPassword(RecuperacionPassword recuperacionPassword) {

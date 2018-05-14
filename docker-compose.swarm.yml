@@ -11,7 +11,8 @@ services:
        DB_HOST: 
        DB_NAME: REPLACE_PROJECT_NAME
        DB_USER: 
-       DB_PASS: 
+       DB_PASS:
+       BACKEND_URL: REPLACE_URL_PROD
        LOGSTASH_HOST:
     deploy:
       labels:
