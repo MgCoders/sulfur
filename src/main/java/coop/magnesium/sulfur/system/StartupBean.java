@@ -157,12 +157,13 @@ public class StartupBean {
                 notificacion.setEnviado(true);
             });
 
+            String projectName = configuracionDao.getProjectName();
             List<String> mailsAdmins = configuracionDao.getDestinatariosNotificacionesAdmins();
             if (!stringBuilder.toString().isEmpty()) {
                 mailEvent.fire(
                         new MailEvent(mailsAdmins,
                                 stringBuilder.toString(),
-                                "MARQ: Notificaciones"));
+                                projectName + ": Notificaciones"));
             }
         }
 

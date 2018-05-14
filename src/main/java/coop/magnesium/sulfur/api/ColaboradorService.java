@@ -5,6 +5,7 @@ import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
 import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.CargoDao;
 import coop.magnesium.sulfur.db.dao.ColaboradorDao;
+import coop.magnesium.sulfur.db.dao.ConfiguracionDao;
 import coop.magnesium.sulfur.db.entities.Cargo;
 import coop.magnesium.sulfur.db.entities.Colaborador;
 import coop.magnesium.sulfur.db.entities.Role;
@@ -55,6 +56,8 @@ public class ColaboradorService {
     private ColaboradorDao colaboradorDao;
     @EJB
     private CargoDao cargoDao;
+    @Inject
+    private ConfiguracionDao configuracionDao;
 
     @POST
     @Logged
@@ -72,7 +75,8 @@ public class ColaboradorService {
                 colaborador.setCargo(cargo);
             }
             colaborador = colaboradorDao.save(colaborador);
-            mailEvent.fire(new MailEvent(Arrays.asList(colaborador.getEmail()), MailService.generarEmailNuevoUsuario(endpointsProperties.getProperty("frontend.host")), "MARQ: Nuevo Usuario"));
+            String projectName = configuracionDao.getProjectName();
+            mailEvent.fire(new MailEvent(Arrays.asList(colaborador.getEmail()), MailService.generarEmailNuevoUsuario(endpointsProperties.getProperty("frontend.host"), projectName), projectName + ": Nuevo Usuario"));
             return Response.status(Response.Status.CREATED).entity(colaborador).build();
         } catch (MagnesiumBdMultipleResultsException | MagnesiumBdAlredyExistsException exists) {
             logger.warning("Email ya existe");
