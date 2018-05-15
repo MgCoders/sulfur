@@ -7,12 +7,15 @@ import coop.magnesium.sulfur.db.entities.TipoConfiguracion;
 import coop.magnesium.sulfur.db.entities.TipoNotificacion;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import javax.ejb.*;
+import javax.ejb.EJB;
+import javax.ejb.Schedule;
+import javax.ejb.Singleton;
+import javax.ejb.Startup;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
-import java.time.*;
-import java.util.Date;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -26,8 +29,6 @@ public class StartupBean {
 
     @Inject
     Logger logger;
-    @Resource
-    TimerService timerService;
     @EJB
     HoraDao horaDao;
     @EJB
@@ -98,10 +99,6 @@ public class StartupBean {
     }
 
     public void putRecuperacionPassword(RecuperacionPassword recuperacionPassword) {
-        Instant instant = recuperacionPassword.getExpirationDate().toInstant(ZoneOffset.UTC);
-        TimerConfig timerConfig = new TimerConfig();
-        timerConfig.setInfo(recuperacionPassword.getToken());
-        timerService.createSingleActionTimer(Date.from(instant), timerConfig);
         recuperacionPasswordDao.save(recuperacionPassword);
     }
 
@@ -115,7 +112,7 @@ public class StartupBean {
         }
     }
 
-    @Schedule(hour = "*", info = "cleanRecuperacionContrasena", persistent = false)
+    @Schedule(hour = "*/24", info = "cleanRecuperacionContrasena", persistent = false)
     public void cleanRecuperacionContrasena() {
         //Solo si soy master
         if (configuracionDao.getNodoMaster().equals(jbossNodeName)) {
@@ -177,6 +174,7 @@ public class StartupBean {
     public void limpiarNotificacionesAntiguas(){
         //Solo si soy master
         if (configuracionDao.getNodoMaster().equals(jbossNodeName)) {
+            logger.info("Master limpiando notificaciones antiguas");
             notificacionDao.findAll(LocalDateTime.now().minusDays(100), LocalDateTime.now().minusDays(30)).forEach(notificacion -> notificacionDao.delete(notificacion));
         }
     }

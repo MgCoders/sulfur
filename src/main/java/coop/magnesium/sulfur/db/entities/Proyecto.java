@@ -24,6 +24,7 @@ public class Proyecto {
     private String nombre;
     private Integer prioridad = 1;
     private Boolean enabled = true;
+    private String observacion = "";
 
     public Proyecto() {
     }
@@ -73,6 +74,14 @@ public class Proyecto {
         this.enabled = enabled;
     }
 
+	public String getObservacion() {
+		return observacion;
+	}
+
+	public void setObservacion(String observacion) {
+		this.observacion = observacion;
+	}
+
     @Override
     public String toString() {
         return "Proyecto{" +
@@ -81,6 +90,7 @@ public class Proyecto {
                 ", nombre='" + nombre + '\'' +
                 ", prioridad=" + prioridad +
                 ", enabled=" + enabled +
+                ", observacion='" + observacion + '\'' +
                 '}';
     }
 }
