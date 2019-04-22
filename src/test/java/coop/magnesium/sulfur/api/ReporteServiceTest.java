@@ -270,7 +270,9 @@ public class ReporteServiceTest {
     @RunAsClient
     public void getReporteFechas(@ArquillianResteasyResource final WebTarget webTarget) {
         final Response response = webTarget
-                .path("/reportes/horas/fechas/01-01-2018/01-01-2019/")
+                .path("/reportes/horas/fechas/")
+                .queryParam("fecha_ini", "01-01-2018")
+                .queryParam("fecha_fin", "01-01-2020")
                 .request(MediaType.APPLICATION_JSON)
                 .header("AUTHORIZATION", "ADMIN:2")
                 .get();
@@ -293,7 +295,9 @@ public class ReporteServiceTest {
     @RunAsClient
     public void getReporteFechasProyecto(@ArquillianResteasyResource final WebTarget webTarget) {
         final Response response = webTarget
-                .path("/reportes/horas/fechas/01-01-2018/01-01-2019/proyecto/1")
+                .path("/reportes/horas/fechas/proyecto/1")
+                .queryParam("fecha_ini", "01-01-2018")
+                .queryParam("fecha_fin", "01-01-2020")
                 .request(MediaType.APPLICATION_JSON)
                 .header("AUTHORIZATION", "ADMIN:2")
                 .get();
@@ -316,7 +320,7 @@ public class ReporteServiceTest {
     @RunAsClient
     public void getReporteFechasXColaborador(@ArquillianResteasyResource final WebTarget webTarget) {
         final Response response = webTarget
-                .path("/reportes/horas/colaboradores/fechas/01-01-2018/01-01-2019")
+                .path("/reportes/horas/colaboradores/fechas/01-01-2018/01-01-2020")
                 .request(MediaType.APPLICATION_JSON)
                 .header("AUTHORIZATION", "ADMIN:2")
                 .get();
@@ -339,7 +343,7 @@ public class ReporteServiceTest {
     @RunAsClient
     public void getReporteFechasXCargoProyectos(@ArquillianResteasyResource final WebTarget webTarget) {
         final Response response = webTarget
-                .path("/reportes/horas/proyectos/fechas/01-01-2018/01-01-2019")
+                .path("/reportes/horas/proyectos/fechas/01-01-2018/01-01-2020")
                 .request(MediaType.APPLICATION_JSON)
                 .header("AUTHORIZATION", "ADMIN:2")
                 .get();

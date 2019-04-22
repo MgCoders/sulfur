@@ -141,7 +141,7 @@ public class NotificacionServiceTest {
     @RunAsClient
     public void getNotificacionUser1(@ArquillianResteasyResource final WebTarget webTarget) {
         final Response response = webTarget
-                .path("/notificaciones/colaborador/1/01-01-2018/01-01-2019/")
+                .path("/notificaciones/colaborador/1/01-01-2018/01-01-2020/")
                 .request(MediaType.APPLICATION_JSON)
                 .header("AUTHORIZATION", "USER:1")
                 .get();
@@ -156,7 +156,7 @@ public class NotificacionServiceTest {
     @RunAsClient
     public void getNotificacionUser2(@ArquillianResteasyResource final WebTarget webTarget) {
         final Response response = webTarget
-                .path("/notificaciones/colaborador/2/01-01-2018/01-01-2019/")
+                .path("/notificaciones/colaborador/2/01-01-2018/01-01-2020/")
                 .request(MediaType.APPLICATION_JSON)
                 .header("AUTHORIZATION", "USER:2")
                 .get();

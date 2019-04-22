@@ -95,8 +95,26 @@ public class ReportesService {
     @RoleNeeded({Role.ADMIN})
     @Logged
     @ApiOperation(value = "Horas de Proyecto y TipoTarea agrupadas por Cargo", response = ReporteHoras1.class, responseContainer = "List")
-    public Response reporte1(@PathParam("proyecto_id") Long proyecto_id, @PathParam("tarea_id") Long tarea_id) {
+    public Response reporte1(@PathParam("proyecto_id") Long proyecto_id,
+                             @PathParam("tarea_id") Long tarea_id,
+                             @QueryParam("fecha_ini") String fechaIniString,
+                             @QueryParam("fecha_fin") String fechaFinString) {
         try {
+
+            LocalDate fechaIni;
+            if (fechaIniString != null && !fechaIniString.isEmpty()) {
+                fechaIni = LocalDate.parse(fechaIniString, formatter);
+            } else {
+                fechaIni = LocalDate.parse("01-01-2017", formatter);
+            }
+
+            LocalDate fechaFin;
+            if (fechaFinString != null && !fechaFinString.isEmpty()) {
+                fechaFin = LocalDate.parse(fechaFinString, formatter);
+            } else {
+                fechaFin = LocalDate.now().plusDays(1);
+            }
+
             Proyecto proyecto = proyectoDao.findById(proyecto_id);
             if (proyecto == null)
                 throw new MagnesiumNotFoundException("Proyecto no encontrado");
@@ -104,7 +122,7 @@ public class ReportesService {
             if (tipoTarea == null)
                 throw new MagnesiumNotFoundException("Tarea no encontrada");
 
-            List<ReporteHoras1> reporteHoras1List = reportesDao.reporteHoras1(proyecto, tipoTarea);
+            List<ReporteHoras1> reporteHoras1List = reportesDao.reporteHoras1(proyecto, tipoTarea, fechaIni, fechaFin);
             return Response.ok(reporteHoras1List).build();
 
         } catch (MagnesiumNotFoundException e) {
@@ -115,17 +133,28 @@ public class ReportesService {
     }
 
     @GET
-    @Path("horas/fechas/{fecha_ini}/{fecha_fin}")
+    @Path("horas/fechas")
     @JWTTokenNeeded
     @RoleNeeded({Role.ADMIN})
     @Logged
     @ApiOperation(value = "Reporte de horas cargadas por fechas", response = ReporteHoras1.class, responseContainer = "List")
-    public Response reporteFechas(@PathParam("fecha_ini") String fechaIniString,
-                                  @PathParam("fecha_fin") String fechaFinString) {
+    public Response reporteFechas(@QueryParam("fecha_ini") String fechaIniString,
+                                  @QueryParam("fecha_fin") String fechaFinString) {
         try {
 
-            LocalDate fechaIni = LocalDate.parse(fechaIniString, formatter);
-            LocalDate fechaFin = LocalDate.parse(fechaFinString, formatter);
+            LocalDate fechaIni;
+            if (fechaIniString != null && !fechaIniString.isEmpty()) {
+                fechaIni = LocalDate.parse(fechaIniString, formatter);
+            } else {
+                fechaIni = LocalDate.parse("01-01-2017", formatter);
+            }
+
+            LocalDate fechaFin;
+            if (fechaFinString != null && !fechaFinString.isEmpty()) {
+                fechaFin = LocalDate.parse(fechaFinString, formatter);
+            } else {
+                fechaFin = LocalDate.now().plusDays(1);
+            }
 
             List<ReporteHoras1> reporteHoras2List = reportesDao.reporteHoras2Fechas(fechaIni, fechaFin);
             return Response.ok(reporteHoras2List).build();
@@ -181,18 +210,30 @@ public class ReportesService {
     }
 
     @GET
-    @Path("horas/fechas/{fecha_ini}/{fecha_fin}/proyecto/{proyecto_id}")
+    @Path("horas/fechas/proyecto/{proyecto_id}")
     @JWTTokenNeeded
     @RoleNeeded({Role.ADMIN})
     @Logged
     @ApiOperation(value = "Reporte de horas cargadas por fechas y proyecto", response = ReporteHoras1.class, responseContainer = "List")
-    public Response reporteFechaProyecto(@PathParam("fecha_ini") String fechaIniString,
-                                         @PathParam("fecha_fin") String fechaFinString,
-                                         @PathParam("proyecto_id") Long proyecto_id) {
+    public Response reporteFechaProyecto(@PathParam("proyecto_id") Long proyecto_id,
+                                         @QueryParam("fecha_ini") String fechaIniString,
+                                         @QueryParam("fecha_fin") String fechaFinString) {
         try {
 
-            LocalDate fechaIni = LocalDate.parse(fechaIniString, formatter);
-            LocalDate fechaFin = LocalDate.parse(fechaFinString, formatter);
+            LocalDate fechaIni;
+            if (fechaIniString != null && !fechaIniString.isEmpty()) {
+                fechaIni = LocalDate.parse(fechaIniString, formatter);
+            } else {
+                fechaIni = LocalDate.parse("01-01-2017", formatter);
+            }
+
+            LocalDate fechaFin;
+            if (fechaFinString != null && !fechaFinString.isEmpty()) {
+                fechaFin = LocalDate.parse(fechaFinString, formatter);
+            } else {
+                fechaFin = LocalDate.now().plusDays(1);
+            }
+
             Proyecto proyecto = proyectoDao.findById(proyecto_id);
             if (proyecto == null)
                 throw new MagnesiumNotFoundException("Proyecto no encontrado");

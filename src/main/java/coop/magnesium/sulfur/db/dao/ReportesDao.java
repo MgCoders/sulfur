@@ -51,7 +51,7 @@ public class ReportesDao {
      * @param tipoTarea
      * @return
      */
-    public List<ReporteHoras1> reporteHoras1(Proyecto proyecto, TipoTarea tipoTarea) {
+    public List<ReporteHoras1> reporteHoras1(Proyecto proyecto, TipoTarea tipoTarea, LocalDate ini, LocalDate fin) {
 
         //Busco las estimaciones
         Map<Long, EstimacionProyectoTipoTareaXCargo> estimacionesXCargo = estimacionDao.findEstimacionProyectoTipoTareaXCargo(proyecto, tipoTarea);
@@ -63,7 +63,7 @@ public class ReportesDao {
         cargoDao.findAll().forEach(cargo -> reporteXCargo.put(cargo, new ReporteHoras1(BigDecimal.ZERO, estimacionesXCargo.get(cargo.getId()) != null ? estimacionesXCargo.get(cargo.getId()).cantidadHoras : BigDecimal.ZERO, estimacionesXCargo.get(cargo.getId()) != null ? estimacionesXCargo.get(cargo.getId()).precioTotal : BigDecimal.ZERO, BigDecimal.ZERO, proyecto, tipoTarea, cargo)));
 
         //Aca voy a buscar el precio hora e ir consolidando las diferentes filas con mismo cargo.
-        horaDao.findHorasProyectoTipoTareaXCargo(proyecto, tipoTarea).forEach(horaCompleta -> {
+        horaDao.findHorasProyectoTipoTareaXCargo(proyecto, tipoTarea, ini, fin).forEach(horaCompleta -> {
             //logger.info(horaCompleta.toString());
             Cargo cargo = cargoDao.findById(horaCompleta.cargo_id);
             BigDecimal costoXHora = horaDao.findPrecioHoraCargo(cargo, horaCompleta.dia);
