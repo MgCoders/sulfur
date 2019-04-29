@@ -273,7 +273,7 @@ public class HoraDao extends AbstractDao<Hora, Long> {
         return query.getResultList();
     }
 
-    public List<HoraCompletaReporte1> findHorasProyectoXCargo(Proyecto proyecto) {
+    public List<HoraCompletaReporte1> findHorasProyectoXCargo(Proyecto proyecto, LocalDate ini, LocalDate fin) {
         Query query = em.createNativeQuery(
                 "SELECT\n" +
                         "  p.id             proyecto_id,\n" +
@@ -294,6 +294,7 @@ public class HoraDao extends AbstractDao<Hora, Long> {
                         "      AND hd.tipoTarea_id = ta.id\n" +
                         "      AND hd.proyecto_id = p.id\n" +
                         "      AND ca.id = hd.cargo_id\n" +
+                        "      AND h.dia >= :ini AND h.dia <= :fin " +
                         "GROUP BY\n" +
                         "  p.id,\n" +
                         "  ta.id,\n" +
@@ -302,6 +303,8 @@ public class HoraDao extends AbstractDao<Hora, Long> {
                         "  h.dia\n" +
                         "ORDER BY co.cargo_id;", "HoraCompletaReporte1");
         query.setParameter("proyecto", proyecto.getId());
+        query.setParameter("ini", ini);
+        query.setParameter("fin", fin);
         return query.getResultList();
     }
 

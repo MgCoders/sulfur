@@ -105,7 +105,7 @@ public class ReportesService {
             if (fechaIniString != null && !fechaIniString.isEmpty()) {
                 fechaIni = LocalDate.parse(fechaIniString, formatter);
             } else {
-                fechaIni = LocalDate.parse("01-01-2017", formatter);
+                fechaIni = LocalDate.parse("01-01-1900", formatter);
             }
 
             LocalDate fechaFin;
@@ -146,7 +146,7 @@ public class ReportesService {
             if (fechaIniString != null && !fechaIniString.isEmpty()) {
                 fechaIni = LocalDate.parse(fechaIniString, formatter);
             } else {
-                fechaIni = LocalDate.parse("01-01-2017", formatter);
+                fechaIni = LocalDate.parse("01-01-1900", formatter);
             }
 
             LocalDate fechaFin;
@@ -224,7 +224,7 @@ public class ReportesService {
             if (fechaIniString != null && !fechaIniString.isEmpty()) {
                 fechaIni = LocalDate.parse(fechaIniString, formatter);
             } else {
-                fechaIni = LocalDate.parse("01-01-2017", formatter);
+                fechaIni = LocalDate.parse("01-01-1900", formatter);
             }
 
             LocalDate fechaFin;
@@ -256,13 +256,29 @@ public class ReportesService {
     @RoleNeeded({Role.ADMIN})
     @Logged
     @ApiOperation(value = "Horas de Proyecto agrupadas por Cargo", response = ReporteHoras1.class, responseContainer = "List")
-    public Response reporte1Totales(@PathParam("proyecto_id") Long proyecto_id) {
+    public Response reporte1Totales(@PathParam("proyecto_id") Long proyecto_id,
+                                    @QueryParam("fecha_ini") String fechaIniString,
+                                    @QueryParam("fecha_fin") String fechaFinString) {
         try {
+            LocalDate fechaIni;
+            if (fechaIniString != null && !fechaIniString.isEmpty()) {
+                fechaIni = LocalDate.parse(fechaIniString, formatter);
+            } else {
+                fechaIni = LocalDate.parse("01-01-1900", formatter);
+            }
+
+            LocalDate fechaFin;
+            if (fechaFinString != null && !fechaFinString.isEmpty()) {
+                fechaFin = LocalDate.parse(fechaFinString, formatter);
+            } else {
+                fechaFin = LocalDate.now().plusDays(1);
+            }
+
             Proyecto proyecto = proyectoDao.findById(proyecto_id);
             if (proyecto == null)
                 throw new MagnesiumNotFoundException("Proyecto no encontrado");
 
-            List<ReporteHoras1> reporteHoras1List = reportesDao.reporteHoras1Totales(proyecto);
+            List<ReporteHoras1> reporteHoras1List = reportesDao.reporteHoras1Totales(proyecto, fechaIni, fechaFin);
             //reporteHoras1List.forEach(reporteHoras1 -> logger.info(reporteHoras1.toString()));
             return Response.ok(reporteHoras1List).build();
 

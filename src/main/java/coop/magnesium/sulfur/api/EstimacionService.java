@@ -148,5 +148,24 @@ public class EstimacionService {
         }
     }
 
+    @POST
+    @Path("delete/{id}")
+    @JWTTokenNeeded
+    @RoleNeeded({Role.ADMIN})
+    @ApiOperation(value = "Delete estimacion", response = Estimacion.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 304, message = "Error: objeto no modificado")})
+    public Response delete(@PathParam("id") Long id) {
+        try {
+            Estimacion est = this.estimacionDao.findById(id);
+            if(est == null)
+                throw new Exception("No existe ninguna estimación con id " + id);
 
+            this.estimacionDao.delete(id);
+
+            return Response.ok(est).build();
+        } catch (Exception e) {
+            return Response.notModified().entity(e.getMessage()).build();
+        }
+    }
 }
