@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>magnesium.coop</groupId>
     <artifactId>sulfur-backend</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
     <packaging>war</packaging>
     <dependencies>
         <dependency>
