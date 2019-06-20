@@ -1,9 +1,9 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.1.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
     <groupId>magnesium.coop</groupId>
     <artifactId>sulfur-backend</artifactId>
-    <version>1.6</version>
+    <version>1.7</version>
     <packaging>war</packaging>
     <dependencies>
         <dependency>
