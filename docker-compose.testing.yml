@@ -29,7 +29,7 @@ services:
   pg_REPLACE_PROJECT_NAME:
     image: postgres
     ports:
-      - 55555:5432
+      - 55556:5432
     networks:
       - traefik_proxy
     volumes:
