@@ -16,5 +16,6 @@ public enum TipoConfiguracion {
     LOGO_URL,
     FRONTEND_HOST,
     FRONTEND_PATH,
-    REST_BASE_PATH
+    REST_BASE_PATH,
+    ICO_URL
 }

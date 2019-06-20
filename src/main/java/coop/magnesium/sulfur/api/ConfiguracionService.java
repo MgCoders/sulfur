@@ -5,6 +5,7 @@ import coop.magnesium.sulfur.api.utils.JWTTokenNeeded;
 import coop.magnesium.sulfur.api.utils.RoleNeeded;
 import coop.magnesium.sulfur.db.dao.ConfiguracionDao;
 import coop.magnesium.sulfur.db.entities.Role;
+import coop.magnesium.sulfur.db.entities.TipoConfiguracion;
 import coop.magnesium.sulfur.utils.Logged;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -112,6 +113,13 @@ public class ConfiguracionService {
     @ApiOperation(value = "Get project logo", response = Response.class)
     public Response getProjectLogo() {
         return Response.ok(configuracionDao.getProjectLogo()).build();
+    }
+
+    @GET
+    @Path("project/ico")
+    @ApiOperation(value = "Get project logo", response = Response.class)
+    public Response getProjectIco() {
+        return Response.ok(configuracionDao.getStringProperty(TipoConfiguracion.ICO_URL)).build();
     }
 
     @POST
